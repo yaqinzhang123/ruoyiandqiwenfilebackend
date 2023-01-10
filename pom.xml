@@ -31,6 +31,8 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
+        <hutool.version>5.8.10</hutool.version>
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -46,11 +48,25 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- hutool 的依赖配置-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-bom</artifactId>
+                <version>${hutool.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- 阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
             <!-- 解析客户端操作系统、浏览器等 -->
@@ -65,6 +81,12 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -177,6 +199,12 @@
                 <artifactId>ruoyi-common</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+            <!-- 网盘工具-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-file</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -188,14 +216,9 @@
         <module>ruoyi-quartz</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
+        <module>ruoyi-file</module>
     </modules>
     <packaging>pom</packaging>
-
-
-    <dependencies>
-
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

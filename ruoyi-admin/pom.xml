@@ -60,6 +60,11 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
+        <!-- 网盘-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-file</artifactId>
+        </dependency>
 
     </dependencies>
 

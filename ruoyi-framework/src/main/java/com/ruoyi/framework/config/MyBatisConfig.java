@@ -1,18 +1,13 @@
 package com.ruoyi.framework.config;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import javax.sql.DataSource;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -22,14 +17,20 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
-import com.ruoyi.common.utils.StringUtils;
+
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Mybatis支持*匹配扫描包
  * 
  * @author ruoyi
  */
-@Configuration
+//@Configuration
 public class MyBatisConfig
 {
     @Autowired
@@ -116,13 +117,15 @@ public class MyBatisConfig
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception
     {
-        String typeAliasesPackage = env.getProperty("mybatis.typeAliasesPackage");
-        String mapperLocations = env.getProperty("mybatis.mapperLocations");
-        String configLocation = env.getProperty("mybatis.configLocation");
+        String typeAliasesPackage = env.getProperty("mybatis-plus.type-aliases-package");
+        String mapperLocations = env.getProperty("mybatis.mapper-locations");
+        String configLocation = env.getProperty("mybatis.config-locations");
         typeAliasesPackage = setTypeAliasesPackage(typeAliasesPackage);
         VFS.addImplClass(SpringBootVFS.class);
 
-        final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+//        final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        final MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
+//        sessionFactory.setPlugins(interceptor);
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
         sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
