@@ -7,17 +7,17 @@
 <mapper namespace="com.ruoyi.file.mapper.CommonFileMapper">
 
     <select id="selectCommonFileUser" parameterType="java.lang.Long" resultType="com.ruoyi.file.vo.commonfile.CommonFileUser">
-        SELECT c.userId, (SELECT username FROM user WHERE user.userId = c.userId) username FROM commonfile a
-        LEFT JOIN filepermission b ON a.commonFileId = b.commonFileId
-        LEFT JOIN userfile c ON c.userFileId = a.userFileId
-        WHERE b.userId = #{userId}
+        SELECT c.user_id, (SELECT user_name FROM sys_user WHERE sys_user.user_id = c.user_id) username FROM commonfile a
+        LEFT JOIN filepermission b ON a.common_file_id = b.common_file_id
+        LEFT JOIN userfile c ON c.user_file_id = a.user_file_id
+        WHERE b.user_id = #{userId}
     </select>
 
     <select id="selectCommonFileByUser" resultType="com.ruoyi.file.vo.commonfile.CommonFileListVo">
         SELECT * FROM commonfile a
-        LEFT JOIN userfile b ON b.userFileId = a.userFileId
-        left join filepermission c on c.commonFileId = a.commonFileId
-        WHERE b.userId = #{userId} and c.userId = #{sessionUserId}
+        LEFT JOIN userfile b ON b.user_file_id = a.user_file_id
+        left join filepermission c on c.common_file_id = a.common_file_id
+        WHERE b.user_id = #{userId} and c.user_id = #{sessionUserId}
     </select>
     
 

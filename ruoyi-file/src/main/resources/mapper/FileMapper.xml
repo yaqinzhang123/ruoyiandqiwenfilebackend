@@ -7,8 +7,8 @@
 <mapper namespace="com.ruoyi.file.mapper.FileMapper">
 
     <insert id="batchInsertFile" parameterType="java.util.List">
-        INSERT ignore INTO file (userId, fileName,timeStampName, fileUrl,
-        filePath, extendName, uploadTime, fileSize, isDir)
+        INSERT ignore INTO file (user_id, file_name,time_stamp_name, file_url,
+        file_path, extend_name, upload_time, file_size, is_dir)
         VALUES
         <foreach collection="list" item="file" index="index" separator=",">
         (#{file.userId}, #{file.fileName},#{file.timeStampName},

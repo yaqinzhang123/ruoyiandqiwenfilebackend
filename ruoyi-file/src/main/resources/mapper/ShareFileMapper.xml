@@ -8,7 +8,7 @@
 
 
     <insert id="batchInsertShareFile" parameterType="java.util.List">
-        INSERT ignore INTO sharefile (shareBatchNum, userFileId, shareFilePath)
+        INSERT ignore INTO sharefile (share_batch_num, user_file_id, share_file_path)
         VALUES
         <foreach collection="list" item="file" index="index" separator=",">
         (#{file.shareBatchNum}, #{file.userFileId}, #{file.shareFilePath})
@@ -17,11 +17,11 @@
 
     <select id="selectShareFileList" resultType="com.ruoyi.file.vo.share.ShareFileListVO">
         select * from sharefile a
-        LEFT JOIN share ON share.shareBatchNum = a.shareBatchNum
-        left join userfile b on b.userFileId = a.userFileId
-        left join file c on c.fileId = b.fileId
-        where a.shareBatchNum = #{shareBatchNum}
-        and a.shareFilePath = #{shareFilePath}
+        LEFT JOIN share ON share.share_batch_num = a.share_batch_num
+        left join userfile b on b.user_file_id = a.user_file_id
+        left join file c on c.file_id = b.file_id
+        where a.share_batch_num = #{shareBatchNum}
+        and a.share_file_path = #{shareFilePath}
     </select>
 
 

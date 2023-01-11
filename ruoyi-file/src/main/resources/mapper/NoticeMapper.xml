@@ -18,16 +18,16 @@
                 and publisher = #{noticeListDTO.publisher}
             </if>
             <if test="noticeListDTO.beginTime != null and noticeListDTO.beginTime != ''">
-                and createTime &gt;= #{noticeListDTO.beginTime}
+                and create_time &gt;= #{noticeListDTO.beginTime}
             </if>
             <if test="noticeListDTO.endTime != null and noticeListDTO.endTime != ''">
-                and createTime &lt;= #{noticeListDTO.endTime}
+                and create_time &lt;= #{noticeListDTO.endTime}
             </if>
             <if test="noticeListDTO.title != null and noticeListDTO.title != ''">
                 and title like '%${noticeListDTO.title}%'
             </if>
         </where>
-        order by createTime desc
+        order by create_time desc
     </select>
 
 </mapper>

@@ -6,9 +6,9 @@
 
 <mapper namespace="com.ruoyi.file.mapper.UploadTaskDetailMapper">
     <select id="selectUploadedChunkNumList" parameterType="java.lang.String" resultType="java.lang.Integer">
-        select chunkNumber from uploadtaskdetail
+        select chunk_number from uploadtaskdetail
         where identifier = #{identifier}
-        order by chunkNumber asc
+        order by chunk_number asc
     </select>
 
 </mapper>

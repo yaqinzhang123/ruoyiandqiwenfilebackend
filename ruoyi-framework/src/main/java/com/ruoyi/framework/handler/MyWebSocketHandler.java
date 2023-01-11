@@ -1,14 +1,18 @@
 package com.ruoyi.framework.handler;
 
+import com.ruoyi.framework.web.domain.server.Sys;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
-public class DefaultHandler implements WebSocketHandler {
+public class MyWebSocketHandler implements WebSocketHandler {
 
+
+    public static Set<WebSocketSession> sessions = new HashSet<>();
     /**
      * 建立连接
      * @param session
@@ -17,6 +21,8 @@ public class DefaultHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // 缓存用户信息: userInfo
+        sessions.add(session);
+        System.out.println("当前会话人数: " + sessions.size());
     }
 
     /**
@@ -27,10 +33,11 @@ public class DefaultHandler implements WebSocketHandler {
      */
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-
-        System.out.println(message.getPayload());
-        if(message.getPayload()!=null){
-
+        System.out.println("收到消息: " + message.getPayload());
+//        session.sendMessage(new TextMessage("后端已经收到： " + message.getPayload()));
+        for (WebSocketSession ss:sessions
+             ) {
+            ss.sendMessage(new TextMessage("后端已经收到： " + message.getPayload()));
         }
     }
 
@@ -43,6 +50,7 @@ public class DefaultHandler implements WebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         // 清除用户缓存信息
+        sessions.remove(session);
     }
 
     /**
@@ -54,6 +62,8 @@ public class DefaultHandler implements WebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         // 清除用户缓存信息
+        sessions.remove(session);
+        System.out.print("清除session，Id："+session.getId());
     }
 
     @Override

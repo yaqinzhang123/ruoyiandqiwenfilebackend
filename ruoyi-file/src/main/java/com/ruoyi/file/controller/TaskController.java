@@ -8,12 +8,14 @@ import com.ruoyi.file.domain.ShareFile;
 import com.ruoyi.file.domain.UserFile;
 import com.ruoyi.file.io.QiwenFile;
 import com.ruoyi.file.service.UserFileService;
+import com.ruoyi.framework.web.service.WebSocketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -26,8 +28,8 @@ public class TaskController {
     FileDealComp fileDealComp;
     @Resource
     IShareFileService shareFileService;
-//    @Autowired
-//    private ElasticsearchClient elasticsearchClient;
+    @Resource
+    WebSocketService webSocketService;
 
 
     @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
@@ -81,5 +83,11 @@ public class TaskController {
                 //ignore
             }
         }
+    }
+
+    @Scheduled(cron = "*/5 * * * * ?")
+    private void pushAlarm() throws IOException {
+        System.out.println("开始执行");
+        webSocketService.sendAllMessages("告警推送");
     }
 }

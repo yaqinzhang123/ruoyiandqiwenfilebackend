@@ -6,28 +6,6 @@
 
 <mapper namespace="com.ruoyi.file.mapper.UserFileMapper">
 
-<!--    <resultMap type="FileListVo" id="FileListVoResult">-->
-<!--        <result property="fileId"     column="file_id"      />-->
-<!--        <result property="timeStampName"     column="time_stamp_name"      />-->
-<!--        <result property="fileUrl"     column="file_url"      />-->
-<!--        <result property="fileSize"     column="file_size"      />-->
-<!--        <result property="storageType"     column="storage_type"      />-->
-<!--        <result property="pointCount"     column="point_count"      />-->
-<!--        <result property="identifier"     column="identifier"      />-->
-<!--        <result property="userFileId"     column="user_file_id"      />-->
-<!--        <result property="userId"     column="user_id"      />-->
-<!--        <result property="fileName"     column="file_name"      />-->
-<!--        <result property="filePath"     column="file_path"      />-->
-<!--        <result property="extendName"     column="extend_name"      />-->
-<!--        <result property="isDir"     column="is_dir"      />-->
-<!--        <result property="uploadTime"     column="upload_time"      />-->
-<!--        <result property="deleteFlag"     column="delete_flag"      />-->
-<!--        <result property="deleteTime"     column="delete_time"      />-->
-<!--        <result property="deleteBatchNum"     column="delete_batch_num"      />-->
-<!--        <result property="imageWidth"     column="image_width"      />-->
-<!--        <result property="imageHeight"     column="image_height"      />-->
-<!--    </resultMap>-->
-
     <select id="selectPageVo" parameterType="com.ruoyi.file.domain.UserFile" resultType="com.ruoyi.file.vo.file.FileListVo">
         select * from userfile a
         left join image on a.file_id = image.file_id
@@ -66,7 +44,7 @@
 
     <select id="selectUserFileByLikeRightFilePath" resultType="com.ruoyi.file.domain.UserFile">
         select * from userfile
-        where (filePath = #{filePath} or filePath like concat(#{filePath},'/%')) and userId = #{userId} and deleteFlag = 0
+        where (file_path = #{filePath} or file_path like concat(#{filePath},'/%')) and user_id = #{userId} and delete_flag = 0
     </select>
 
     <select id="selectStorageSizeByUserId" resultType="java.lang.Long" parameterType="java.lang.Long">
