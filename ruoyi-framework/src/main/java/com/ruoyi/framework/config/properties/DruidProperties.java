@@ -33,8 +33,8 @@ public class DruidProperties
     @Value("${spring.datasource.druid.maxEvictableIdleTimeMillis}")
     private int maxEvictableIdleTimeMillis;
 
-    @Value("${spring.datasource.druid.validationQuery}")
-    private String validationQuery;
+//    @Value("${spring.datasource.druid.validationQuery}")
+//    private String validationQuery;
 
     @Value("${spring.datasource.druid.testWhileIdle}")
     private boolean testWhileIdle;
@@ -65,7 +65,7 @@ public class DruidProperties
         /**
          * 用来检测连接是否有效的sql，要求是一个查询语句，常用select 'x'。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。
          */
-        datasource.setValidationQuery(validationQuery);
+//        datasource.setValidationQuery(validationQuery);
         /** 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。 */
         datasource.setTestWhileIdle(testWhileIdle);
         /** 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。 */

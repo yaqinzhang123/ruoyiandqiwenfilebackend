@@ -9,10 +9,12 @@ import com.qiwenshare.common.util.security.JwtUser;
 import com.qiwenshare.common.util.security.SessionUtil;
 import com.ruoyi.file.api.ICommonFileService;
 import com.ruoyi.file.api.IFilePermissionService;
+import com.ruoyi.file.api.IGangGuiService;
 import com.ruoyi.file.api.IUserFileService;
 import com.ruoyi.file.domain.CommonFile;
 import com.ruoyi.file.domain.FilePermission;
 import com.ruoyi.file.domain.UserFile;
+import com.ruoyi.file.domain.railway.GangGui;
 import com.ruoyi.file.dto.commonfile.CommonFileDTO;
 import com.ruoyi.file.io.QiwenFile;
 import com.ruoyi.file.vo.commonfile.CommonFileListVo;
@@ -107,5 +109,4 @@ public class CommonFileController {
         return RestResult.success().data(fileList);
 
     }
-
 }

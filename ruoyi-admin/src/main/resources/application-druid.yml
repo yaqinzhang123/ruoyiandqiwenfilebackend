@@ -2,7 +2,7 @@
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
-        driverClassName: com.mysql.cj.jdbc.Driver
+#        driverClassName: com.mysql.cj.jdbc.Driver
         druid:
             # 主库数据源
             master:
@@ -13,9 +13,9 @@ spring:
             slave:
                 # 从数据源开关/默认关闭
                 enabled: false
-                url: 
-                username: 
-                password: 
+                url: jdbc:sqlserver://192.168.10.7:1433;DatabaseName=RailwayWholespace
+                username: sa
+                password: zkjx@2021
             # 初始连接数
             initialSize: 5
             # 最小连接池数量
@@ -31,7 +31,7 @@ spring:
             # 配置一个连接在池中最大生存的时间，单位是毫秒
             maxEvictableIdleTimeMillis: 900000
             # 配置检测连接是否有效
-            validationQuery: SELECT 1 FROM DUAL
+#            validationQuery: SELECT 1 FROM DUAL
             testWhileIdle: true
             testOnBorrow: false
             testOnReturn: false
