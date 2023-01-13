@@ -3,12 +3,14 @@ package com.ruoyi.file.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.qiwenshare.common.result.RestResult;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.file.api.ISysParamService;
 import com.ruoyi.file.domain.SysParam;
 import com.ruoyi.file.dto.param.QueryGroupParamDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,7 +31,7 @@ public class SysParamController {
     @Operation(summary = "查询系统参数组", tags = {"系统参数管理"})
     @RequestMapping(value = "/grouplist", method = RequestMethod.GET)
     @ResponseBody
-    public RestResult<Map> groupList(
+    public AjaxResult groupList(
             @Parameter(description = "查询参数dto", required = false)
                     QueryGroupParamDTO queryGroupParamDTO
     ) {
@@ -40,7 +42,7 @@ public class SysParamController {
             result.put(sysParam.getSysParamKey(), sysParam.getSysParamValue());
         }
 
-        return RestResult.success().data(result);
+        return AjaxResult.success(result);
     }
 
 

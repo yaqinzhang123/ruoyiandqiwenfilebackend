@@ -5,6 +5,7 @@ import com.qiwenshare.common.result.RestResult;
 import com.qiwenshare.common.util.MimeUtils;
 import com.qiwenshare.common.util.security.JwtUser;
 import com.qiwenshare.common.util.security.SessionUtil;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.file.api.IFileService;
@@ -26,7 +27,9 @@ import com.qiwenshare.ufop.operation.download.Downloader;
 import com.qiwenshare.ufop.operation.download.domain.DownloadFile;
 import com.qiwenshare.ufop.operation.download.domain.Range;
 import com.qiwenshare.ufop.util.UFOPUtils;
+import com.ruoyi.framework.web.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -56,6 +59,8 @@ public class FiletransferController {
     IFiletransferService filetransferService;
 
     @Resource
+    TokenService tokenService;
+    @Resource
     IFileService fileService;
     @Resource
     IUserFileService userFileService;
@@ -73,16 +78,16 @@ public class FiletransferController {
     @RequestMapping(value = "/uploadfile", method = RequestMethod.GET)
     @MyLog(operation = "极速上传", module = CURRENT_MODULE)
     @ResponseBody
-    public RestResult<UploadFileVo> uploadFileSpeed(UploadFileDTO uploadFileDto) {
+    public AjaxResult uploadFileSpeed(HttpServletRequest request, UploadFileDTO uploadFileDto) {
 
-        LoginUser sessionUserBean= SecurityUtils.getLoginUser();
+        LoginUser sessionUserBean = tokenService.getLoginUser(request);
 
         boolean isCheckSuccess = storageService.checkStorage(sessionUserBean.getUserId(), uploadFileDto.getTotalSize());
         if (!isCheckSuccess) {
-            return RestResult.fail().message("存储空间不足");
+            return AjaxResult.error("存储空间不足");
         }
-        UploadFileVo uploadFileVo = filetransferService.uploadFileSpeed(uploadFileDto);
-        return RestResult.success().data(uploadFileVo);
+        UploadFileVo uploadFileVo = filetransferService.uploadFileSpeed(uploadFileDto,sessionUserBean.getUserId());
+        return AjaxResult.success(uploadFileVo);
 
     }
 
@@ -90,14 +95,14 @@ public class FiletransferController {
     @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
     @MyLog(operation = "上传文件", module = CURRENT_MODULE)
     @ResponseBody
-    public RestResult<UploadFileVo> uploadFile(HttpServletRequest request, UploadFileDTO uploadFileDto) {
+    public AjaxResult uploadFile(HttpServletRequest request, UploadFileDTO uploadFileDto) {
 
-         LoginUser sessionUserBean= SecurityUtils.getLoginUser();
+        LoginUser sessionUserBean = tokenService.getLoginUser(request);
 
         filetransferService.uploadFile(request, uploadFileDto, sessionUserBean.getUserId());
 
         UploadFileVo uploadFileVo = new UploadFileVo();
-        return RestResult.success().data(uploadFileVo);
+        return AjaxResult.success(uploadFileVo);
 
     }
 
@@ -146,22 +151,20 @@ public class FiletransferController {
     @Operation(summary = "批量下载文件", description = "批量下载文件", tags = {"filetransfer"})
     @RequestMapping(value = "/batchDownloadFile", method = RequestMethod.GET)
     @MyLog(operation = "批量下载文件", module = CURRENT_MODULE)
-    @ResponseBody
-    public void batchDownloadFile(HttpServletResponse httpServletResponse, BatchDownloadFileDTO batchDownloadFileDTO) {
+    public void batchDownloadFile(HttpServletResponse httpServletResponse,@Parameter String userFileIds) {
 
-        String files = batchDownloadFileDTO.getUserFileIds();
-        String[] userFileIdStrs = files.split(",");
-        List<String> userFileIds = new ArrayList<>();
+        String[] userFileIdStrs = userFileIds.split(",");
+        List<String> userFileIdList = new ArrayList<>();
         for(String userFileId : userFileIdStrs) {
             UserFile userFile = userFileService.getById(userFileId);
             if (userFile.getIsDir() == 0) {
-                userFileIds.add(userFileId);
+                userFileIdList.add(userFileId);
             } else {
                 QiwenFile qiwenFile = new QiwenFile(userFile.getFilePath(), userFile.getFileName(), true);
                 List<UserFile> userFileList = userFileService.selectUserFileByLikeRightFilePath(qiwenFile.getPath(), userFile.getUserId());
                 List<String> userFileIds1 = userFileList.stream().map(UserFile::getUserFileId).collect(Collectors.toList());
-                userFileIds.add(userFile.getUserFileId());
-                userFileIds.addAll(userFileIds1);
+                userFileIdList.add(userFile.getUserFileId());
+                userFileIdList.addAll(userFileIds1);
             }
             
         }
@@ -170,7 +173,7 @@ public class FiletransferController {
         Date date = new Date();
         String fileName = String.valueOf(date.getTime());
         httpServletResponse.addHeader("Content-Disposition", "attachment;fileName=" + fileName + ".zip");// 设置文件名
-        filetransferService.downloadUserFileList(httpServletResponse, userFile.getFilePath(), fileName, userFileIds);
+        filetransferService.downloadUserFileList(httpServletResponse, userFile.getFilePath(), fileName, userFileIdList);
     }
 
     @Operation(summary="预览文件", description="用于文件预览", tags = {"filetransfer"})
@@ -267,7 +270,7 @@ public class FiletransferController {
     @Operation(summary = "获取存储信息", description = "获取存储信息", tags = {"filetransfer"})
     @RequestMapping(value = "/getstorage", method = RequestMethod.GET)
     @ResponseBody
-    public RestResult<StorageBean> getStorage() {
+    public AjaxResult getStorage() {
 
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         StorageBean storageBean = new StorageBean();
@@ -279,7 +282,7 @@ public class FiletransferController {
         Long totalStorageSize = storageService.getTotalStorageSize(sessionUserBean.getUserId());
         storage.setTotalStorageSize(totalStorageSize);
 
-        return RestResult.success().data(storage);
+        return AjaxResult.success(storage);
 
     }
 

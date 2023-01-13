@@ -83,9 +83,8 @@ public class FiletransferService implements IFiletransferService {
 
 
     @Override
-    public UploadFileVo uploadFileSpeed(UploadFileDTO uploadFileDTO) {
+    public UploadFileVo uploadFileSpeed(UploadFileDTO uploadFileDTO,Long userId) {
         UploadFileVo uploadFileVo = new UploadFileVo();
-         LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         Map<String, Object> param = new HashMap<>();
         param.put("identifier", uploadFileDTO.getIdentifier());
         List<FileBean> list = fileMapper.selectByMap(param);
@@ -102,15 +101,15 @@ public class FiletransferService implements IFiletransferService {
         if (list != null && !list.isEmpty()) {
             FileBean file = list.get(0);
 
-            UserFile userFile = new UserFile(qiwenFile, sessionUserBean.getUserId(), file.getFileId());
+            UserFile userFile = new UserFile(qiwenFile, userId, file.getFileId());
             UserFile param1 = QiwenFileUtil.searchQiwenFileParam(userFile);
             List<UserFile> userFileList = userFileMapper.selectList(new QueryWrapper<>(param1));
             if (userFileList.size() <= 0) {
                 userFileMapper.insert(userFile);
-                fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+//                fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
             }
             if (relativePath.contains("/")) {
-                fileDealComp.restoreParentFilePath(qiwenFile, sessionUserBean.getUserId());
+                fileDealComp.restoreParentFilePath(qiwenFile, userId);
             }
 
             uploadFileVo.setSkipUpload(true);
@@ -133,7 +132,7 @@ public class FiletransferService implements IFiletransferService {
                     uploadTask.setFileName(qiwenFile.getNameNotExtend());
                     uploadTask.setFilePath(qiwenFile.getParent());
                     uploadTask.setExtendName(qiwenFile.getExtendName());
-                    uploadTask.setUserId(sessionUserBean.getUserId());
+                    uploadTask.setUserId(userId);
                     uploadTaskMapper.insert(uploadTask);
                 }
             }

@@ -10,6 +10,7 @@ import com.qiwenshare.common.result.RestResult;
 import com.qiwenshare.common.util.DateUtil;
 import com.qiwenshare.common.util.security.JwtUser;
 import com.qiwenshare.common.util.security.SessionUtil;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.file.api.IShareFileService;
@@ -56,7 +57,7 @@ public class ShareController {
     @PostMapping(value = "/sharefile")
     @MyLog(operation = "分享文件", module = CURRENT_MODULE)
     @ResponseBody
-    public RestResult<ShareFileVO> shareFile( @RequestBody ShareFileDTO shareSecretDTO) {
+    public AjaxResult shareFile(@RequestBody ShareFileDTO shareSecretDTO) {
         ShareFileVO shareSecretVO = new ShareFileVO();
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
 
@@ -80,7 +81,7 @@ public class ShareController {
         for (ShareFile shareFile : fileList) {
             UserFile userFile = userFileService.getById(shareFile.getUserFileId());
             if (userFile.getUserId().compareTo(sessionUserBean.getUserId()) != 0) {
-                return RestResult.fail().message("您只能分享自己的文件");
+                return AjaxResult.error("您只能分享自己的文件");
             }
             if (userFile.getIsDir() == 1) {
                 QiwenFile qiwenFile = new QiwenFile(userFile.getFilePath(), userFile.getFileName(), true);
@@ -102,7 +103,7 @@ public class ShareController {
         shareFileService.batchInsertShareFile(saveFileList);
         shareSecretVO.setShareBatchNum(uuid);
 
-        return RestResult.success().data(shareSecretVO);
+        return AjaxResult.success(shareSecretVO);
     }
 
     @Operation(summary = "保存分享文件", description = "用来将别人分享的文件保存到自己的网盘中", tags = {"share"})
@@ -110,7 +111,7 @@ public class ShareController {
     @MyLog(operation = "保存分享文件", module = CURRENT_MODULE)
     @Transactional(rollbackFor=Exception.class)
     @ResponseBody
-    public RestResult saveShareFile(@RequestBody SaveShareFileDTO saveShareFileDTO) {
+    public AjaxResult saveShareFile(@RequestBody SaveShareFileDTO saveShareFileDTO) {
 
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         List<ShareFile> fileList = JSON.parseArray(saveShareFileDTO.getFiles(), ShareFile.class);
@@ -146,13 +147,13 @@ public class ShareController {
         log.info("----------" + JSON.toJSONString(saveUserFileList));
         userFileService.saveBatch(saveUserFileList);
 
-        return RestResult.success();
+        return AjaxResult.success();
     }
 
     @Operation(summary = "查看已分享列表", description = "查看已分享列表", tags = {"share"})
     @GetMapping(value = "/shareList")
     @ResponseBody
-    public RestResult shareList(ShareListDTO shareListDTO) {
+    public AjaxResult shareList(ShareListDTO shareListDTO) {
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         List<ShareListVO> shareList = shareService.selectShareList(shareListDTO, sessionUserBean.getUserId());
 
@@ -161,59 +162,59 @@ public class ShareController {
         Map<String, Object> map = new HashMap<>();
         map.put("total", total);
         map.put("list", shareList);
-        return RestResult.success().data(map);
+        return AjaxResult.success(map);
     }
 
 
     @Operation(summary = "分享文件列表", description = "分享列表", tags = {"share"})
     @GetMapping(value = "/sharefileList")
     @ResponseBody
-    public RestResult<List<ShareFileListVO>> shareFileList(ShareFileListDTO shareFileListBySecretDTO) {
+    public AjaxResult shareFileList(ShareFileListDTO shareFileListBySecretDTO) {
         String shareBatchNum = shareFileListBySecretDTO.getShareBatchNum();
         String shareFilePath = shareFileListBySecretDTO.getShareFilePath();
         List<ShareFileListVO> list = shareFileService.selectShareFileList(shareBatchNum, shareFilePath);
         for (ShareFileListVO shareFileListVO : list) {
             shareFileListVO.setShareFilePath(shareFilePath);
         }
-        return RestResult.success().data(list);
+        return AjaxResult.success(list);
     }
 
     @Operation(summary = "分享类型", description = "可用此接口判断是否需要提取码", tags = {"share"})
     @GetMapping(value = "/sharetype")
     @ResponseBody
-    public RestResult<ShareTypeVO> shareType(ShareTypeDTO shareTypeDTO) {
+    public AjaxResult shareType(ShareTypeDTO shareTypeDTO) {
         LambdaQueryWrapper<Share> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Share::getShareBatchNum, shareTypeDTO.getShareBatchNum());
         Share share = shareService.getOne(lambdaQueryWrapper);
         ShareTypeVO shareTypeVO = new ShareTypeVO();
         shareTypeVO.setShareType(share.getShareType());
-        return RestResult.success().data(shareTypeVO);
+        return AjaxResult.success(shareTypeVO);
     }
 
     @Operation(summary = "校验提取码", description = "校验提取码", tags = {"share"})
     @GetMapping(value = "/checkextractioncode")
     @ResponseBody
-    public RestResult<String> checkExtractionCode(CheckExtractionCodeDTO checkExtractionCodeDTO) {
+    public AjaxResult checkExtractionCode(CheckExtractionCodeDTO checkExtractionCodeDTO) {
         LambdaQueryWrapper<Share> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Share::getShareBatchNum, checkExtractionCodeDTO.getShareBatchNum())
                 .eq(Share::getExtractionCode, checkExtractionCodeDTO.getExtractionCode());
         List<Share> list = shareService.list(lambdaQueryWrapper);
         if (list.isEmpty()) {
-            return RestResult.fail().message("校验失败");
+            return AjaxResult.error("校验失败");
         } else {
-            return RestResult.success();
+            return AjaxResult.success();
         }
     }
 
     @Operation(summary = "校验过期时间", description = "校验过期时间", tags = {"share"})
     @GetMapping(value = "/checkendtime")
     @ResponseBody
-    public RestResult<String> checkEndTime(CheckEndTimeDTO checkEndTimeDTO) {
+    public AjaxResult checkEndTime(CheckEndTimeDTO checkEndTimeDTO) {
         LambdaQueryWrapper<Share> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Share::getShareBatchNum, checkEndTimeDTO.getShareBatchNum());
         Share share = shareService.getOne(lambdaQueryWrapper);
         if (share == null) {
-            return RestResult.fail().message("文件不存在！");
+            return AjaxResult.error("文件不存在！");
         }
         String endTime = share.getEndTime();
         Date endTimeDate = null;
@@ -223,9 +224,9 @@ public class ShareController {
             log.error("日期解析失败：{}" , e);
         }
         if (new Date().after(endTimeDate))  {
-            return RestResult.fail().message("分享已过期");
+            return AjaxResult.error("分享已过期");
         } else {
-            return RestResult.success();
+            return AjaxResult.success();
         }
     }
 }

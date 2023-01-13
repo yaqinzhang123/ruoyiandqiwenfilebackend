@@ -5,6 +5,7 @@ import com.qiwenshare.common.anno.MyLog;
 import com.qiwenshare.common.result.RestResult;
 import com.qiwenshare.common.util.security.JwtUser;
 import com.qiwenshare.common.util.security.SessionUtil;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.file.api.*;
@@ -46,21 +47,21 @@ public class RecoveryFileController {
     @MyLog(operation = "删除回收文件", module = CURRENT_MODULE)
     @RequestMapping(value = "/deleterecoveryfile", method = RequestMethod.POST)
     @ResponseBody
-    public RestResult<String> deleteRecoveryFile(@RequestBody DeleteRecoveryFileDTO deleteRecoveryFileDTO) {
+    public AjaxResult deleteRecoveryFile(@RequestBody DeleteRecoveryFileDTO deleteRecoveryFileDTO) {
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         RecoveryFile recoveryFile = recoveryFileService.getById(deleteRecoveryFileDTO.getRecoveryFileId());
 
         asyncTaskComp.deleteUserFile(recoveryFile.getUserFileId());
 
         recoveryFileService.removeById(deleteRecoveryFileDTO.getRecoveryFileId());
-        return RestResult.success().data("删除成功");
+        return AjaxResult.success("删除成功");
     }
 
     @Operation(summary = "批量删除回收文件", description = "批量删除回收文件", tags = {"recoveryfile"})
     @RequestMapping(value = "/batchdelete", method = RequestMethod.POST)
     @MyLog(operation = "批量删除回收文件", module = CURRENT_MODULE)
     @ResponseBody
-    public RestResult<String> batchDeleteRecoveryFile(@RequestBody BatchDeleteRecoveryFileDTO batchDeleteRecoveryFileDTO) {
+    public AjaxResult batchDeleteRecoveryFile(@RequestBody BatchDeleteRecoveryFileDTO batchDeleteRecoveryFileDTO) {
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         List<RecoveryFile> recoveryFileList = JSON.parseArray(batchDeleteRecoveryFileDTO.getRecoveryFileIds(), RecoveryFile.class);
         for (RecoveryFile recoveryFile : recoveryFileList) {
@@ -73,30 +74,27 @@ public class RecoveryFileController {
             }
 
         }
-        return RestResult.success().data("批量删除成功");
+        return AjaxResult.success("批量删除成功");
     }
 
     @Operation(summary = "回收文件列表", description = "回收文件列表", tags = {"recoveryfile"})
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ResponseBody
-    public RestResult<List<RecoveryFileListVo>> getRecoveryFileList() {
-         LoginUser sessionUserBean= SecurityUtils.getLoginUser();
+    public AjaxResult getRecoveryFileList() {
+        LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         RestResult<List<RecoveryFileListVo>> restResult = new RestResult<List<RecoveryFileListVo>>();
         List<RecoveryFileListVo> recoveryFileList = recoveryFileService.selectRecoveryFileList(sessionUserBean.getUserId());
-        restResult.setData(recoveryFileList);
-        restResult.setSuccess(true);
-
-        return restResult;
+        return AjaxResult.success(recoveryFileList);
     }
 
     @Operation(summary = "还原文件", description = "还原文件", tags = {"recoveryfile"})
     @RequestMapping(value = "/restorefile", method = RequestMethod.POST)
     @MyLog(operation = "还原文件", module = CURRENT_MODULE)
     @ResponseBody
-    public RestResult restoreFile(@RequestBody RestoreFileDTO restoreFileDto) {
+    public AjaxResult restoreFile(@RequestBody RestoreFileDTO restoreFileDto) {
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         recoveryFileService.restorefile(restoreFileDto.getDeleteBatchNum(), restoreFileDto.getFilePath(), sessionUserBean.getUserId());
-        return RestResult.success().message("还原成功！");
+        return AjaxResult.success("还原成功！");
     }
 
 }

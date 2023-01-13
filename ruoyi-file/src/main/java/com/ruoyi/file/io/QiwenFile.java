@@ -43,6 +43,9 @@ public class QiwenFile {
     }
 
     public static String formatPath(String path) {
+        if(StringUtils.isEmpty(path)){
+            path="/";
+        }
         path = UFOPUtils.pathSplitFormat(path);
         if ("/".equals(path)) {
             return path;

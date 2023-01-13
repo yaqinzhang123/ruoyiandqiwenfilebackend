@@ -9,6 +9,9 @@ import com.qiwenshare.common.result.RestResult;
 import com.qiwenshare.common.util.DateUtil;
 import com.qiwenshare.common.util.security.JwtUser;
 import com.qiwenshare.common.util.security.SessionUtil;
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.file.api.IFileService;
 import com.ruoyi.file.api.IUserFileService;
 import com.ruoyi.file.component.FileDealComp;
@@ -70,17 +73,15 @@ public class OfficeController {
     @Operation(summary = "创建office文件", description = "创建office文件", tags = {"office"})
     @ResponseBody
     @RequestMapping(value = "/createofficefile", method = RequestMethod.POST)
-    public RestResult<Object> createOfficeFile(@RequestBody CreateOfficeFileDTO createOfficeFileDTO) {
-        RestResult<Object> result = new RestResult<>();
+    public AjaxResult createOfficeFile(@RequestBody CreateOfficeFileDTO createOfficeFileDTO) {
         try{
-
-            JwtUser loginUser = SessionUtil.getSession();
+            LoginUser loginUser =  SecurityUtils.getLoginUser();
             String fileName = createOfficeFileDTO.getFileName();
             String filePath = createOfficeFileDTO.getFilePath();
             String extendName = createOfficeFileDTO.getExtendName();
             List<UserFile> userFiles = userFileService.selectSameUserFile(fileName, filePath, extendName, loginUser.getUserId());
             if (userFiles != null && !userFiles.isEmpty()) {
-                return RestResult.fail().message("同名文件已存在");
+                return AjaxResult.error("同名文件已存在");
             }
             String uuid = UUID.randomUUID().toString().replaceAll("-","");
 
@@ -123,23 +124,22 @@ public class OfficeController {
                 userFile.setFileId(fileBean.getFileId());
                 userFileService.save(userFile);
             }
-            return RestResult.success().message("文件创建成功");
+            return AjaxResult.success("文件创建成功");
         } catch (Exception e) {
             log.error(e.getMessage());
-            return RestResult.fail().message(e.getMessage());
+            e.printStackTrace();
+            return AjaxResult.error(e.getMessage());
         }
     }
 
     @Operation(summary = "预览office文件", description = "预览office文件", tags = {"office"})
     @RequestMapping(value = "/previewofficefile", method = RequestMethod.POST)
     @ResponseBody
-    public RestResult<Object> previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO, @RequestHeader("token") String token) {
-        RestResult<Object> result = new RestResult<>();
+    public AjaxResult previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO, @RequestHeader("token") String token) {
         try {
 
-            JwtUser loginUser = SessionUtil.getSession();
+            LoginUser loginUser =  SecurityUtils.getLoginUser();
             UserFile userFile = userFileService.getById(previewOfficeFileDTO.getUserFileId());
-
             String baseUrl = request.getScheme()+"://"+ deploymentHost + ":" + port + request.getContextPath();
             String query = "?type=show&token="+token;
             String callbackUrl = baseUrl + "/office/IndexServlet" + query;
@@ -156,25 +156,20 @@ public class OfficeController {
             jsonObject.put("file",file);
             jsonObject.put("docserviceApiUrl", ConfigManager.GetProperty("files.docservice.url.site") + ConfigManager.GetProperty("files.docservice.url.api"));
             jsonObject.put("reportName",userFile.getFileName());
-            result.setData(jsonObject);
-            result.setCode(200);
-            result.setMessage("获取报告成功！");
+            return AjaxResult.success("获取报告成功！",jsonObject);
         } catch (Exception e) {
             log.error(e.getMessage());
-            result.setCode(500);
-            result.setMessage("服务器错误！");
+            return AjaxResult.success("服务器错误！",e.getMessage());
         }
-        return result;
     }
     @Operation(summary = "编辑office文件", description = "编辑office文件", tags = {"office"})
     @ResponseBody
     @RequestMapping(value = "/editofficefile", method = RequestMethod.POST)
-    public RestResult<Object> editOfficeFile(HttpServletRequest request, @RequestBody EditOfficeFileDTO editOfficeFileDTO, @RequestHeader("token") String token) {
-        RestResult<Object> result = new RestResult<>();
+    public AjaxResult editOfficeFile(HttpServletRequest request, @RequestBody EditOfficeFileDTO editOfficeFileDTO, @RequestHeader("token") String token) {
         log.info("editOfficeFile");
         try {
 
-            JwtUser loginUser = SessionUtil.getSession();
+            LoginUser loginUser =  SecurityUtils.getLoginUser();
             UserFile userFile = userFileService.getById(editOfficeFileDTO.getUserFileId());
 
             String baseUrl = request.getScheme()+"://"+ deploymentHost + ":" + port + request.getContextPath();
@@ -196,15 +191,11 @@ public class OfficeController {
             jsonObject.put("file",file);
             jsonObject.put("docserviceApiUrl",ConfigManager.GetProperty("files.docservice.url.site") + ConfigManager.GetProperty("files.docservice.url.api"));
             jsonObject.put("reportName",userFile.getFileName());
-            result.setData(jsonObject);
-            result.setCode(200);
-            result.setMessage("编辑报告成功！");
+            return AjaxResult.success("编辑报告成功！",jsonObject);
         } catch (Exception e) {
             log.error(e.getMessage());
-            result.setCode(500);
-            result.setMessage("服务器错误！");
+            return AjaxResult.success("服务器错误！",e.getMessage());
         }
-        return result;
     }
 
 

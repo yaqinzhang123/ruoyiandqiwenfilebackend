@@ -2,7 +2,7 @@ package com.ruoyi.file.component;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
-//import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.qiwenshare.common.util.DateUtil;
@@ -25,6 +25,7 @@ import com.qiwenshare.ufop.operation.download.domain.DownloadFile;
 import com.qiwenshare.ufop.operation.write.Writer;
 import com.qiwenshare.ufop.operation.write.domain.WriteFile;
 import com.qiwenshare.ufop.util.UFOPUtils;
+import com.ruoyi.framework.web.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -65,13 +66,15 @@ public class FileDealComp {
     @Resource
     private IShareService shareService;
     @Resource
+    private TokenService tokenService;
+    @Resource
     private IShareFileService shareFileService;
     @Resource
     private UFOPFactory ufopFactory;
     @Resource
     private MusicMapper musicMapper;
-//    @Autowired
-//    private ElasticsearchClient elasticsearchClient;
+    @Resource
+    private ElasticsearchClient elasticsearchClient;
 
     public static Executor exec = Executors.newFixedThreadPool(10);
 
@@ -185,7 +188,7 @@ public class FileDealComp {
                 .eq(UserFile::getDeleteFlag, 0)
                 .eq(UserFile::getUserId, sessionUserId)
                 .groupBy(UserFile::getFilePath, UserFile::getFileName)
-                .having("count(fileName) >= 2");
+                .having("count(file_name) >= 2");
         List<UserFile> repeatList = userFileMapper.selectList(lambdaQueryWrapper);
 
         for (UserFile userFile : repeatList) {
@@ -282,7 +285,7 @@ public class FileDealComp {
         try {
 
             Map<String, Object> param = new HashMap<>();
-            param.put("userFileId", userFileId);
+            param.put("user_file_id", userFileId);
             List<UserFile> userfileResult = userFileMapper.selectByMap(param);
             if (userfileResult != null && userfileResult.size() > 0) {
                 FileSearch fileSearch = new FileSearch();
@@ -297,7 +300,7 @@ public class FileDealComp {
                     fileSearch.setContent(content);
 
                 }*/
-//                elasticsearchClient.index(i -> i.index("filesearch").id(fileSearch.getUserFileId()).document(fileSearch));
+                elasticsearchClient.index(i -> i.index("filesearch").id(fileSearch.getUserFileId()).document(fileSearch));
             }
         } catch (Exception e) {
             log.debug("ES更新操作失败，请检查配置");
@@ -337,7 +340,7 @@ public class FileDealComp {
         if ("undefined".equals(shareBatchNum)  || StringUtils.isEmpty(shareBatchNum)) {
 
 //            Long userId = userService.getUserIdByToken(token);
-            Long userId=1L;
+            Long userId=tokenService.getLoginUserByToken(token).getUserId();
             log.debug(JSON.toJSONString("当前登录session用户id：" + userId));
             if (userId == null) {
                 return false;
@@ -350,7 +353,7 @@ public class FileDealComp {
             }
         } else {
             Map<String, Object> param = new HashMap<>();
-            param.put("shareBatchNum", shareBatchNum);
+            param.put("share_batch_num", shareBatchNum);
             List<Share> shareList = shareService.listByMap(param);
             //判断批次号
             if (shareList.size() <= 0) {
@@ -365,7 +368,7 @@ public class FileDealComp {
                     return false;
                 }
             }
-            param.put("userFileId", userFileId);
+            param.put("user_file_id", userFileId);
             List<ShareFile> shareFileList = shareFileService.listByMap(param);
             if (shareFileList.size() <= 0) {
                 log.info("用户id和分享批次号不匹配，权限校验失败");

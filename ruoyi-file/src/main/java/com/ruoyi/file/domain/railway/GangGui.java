@@ -34,7 +34,7 @@ public class GangGui {
     private String ChangLianFlag;
     private String ZuoYouGu;
     private String GongLiBiao;
-    private String GuHao;
+    private String GuiHao;
     private String GangGuiNum;
     private String GuiChang;
     private String GuiXing;

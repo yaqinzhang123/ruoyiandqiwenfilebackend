@@ -10,11 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface UserFileMapper extends BaseMapper<UserFile> {
-
-
-
-
-    List<UserFile> selectUserFileByLikeRightFilePath(@Param("file_path") String filePath, @Param("user_id") long userId);
+    List<UserFile> selectUserFileByLikeRightFilePath(@Param("filePath") String filePath, @Param("userId") long userId);
 
     IPage<FileListVo> selectPageVo(Page<?> page, @Param("userFile")UserFile userFile, @Param("fileTypeId")Integer fileTypeId);
     Long selectStorageSizeByUserId( Long userId);

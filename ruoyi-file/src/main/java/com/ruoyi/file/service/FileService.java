@@ -138,13 +138,13 @@ public class FileService extends ServiceImpl<FileMapper, FileBean> implements IF
     public FileDetailVO getFileDetail(String userFileId) {
         UserFile userFile = userFileMapper.selectById(userFileId);
         FileBean fileBean = fileMapper.selectById(userFile.getFileId());
-        Music music = musicMapper.selectOne(new QueryWrapper<Music>().eq("fileId", userFile.getFileId()));
-        Image image = imageMapper.selectOne(new QueryWrapper<Image>().eq("fileId", userFile.getFileId()));
+        Music music = musicMapper.selectOne(new QueryWrapper<Music>().eq("file_id", userFile.getFileId()));
+        Image image = imageMapper.selectOne(new QueryWrapper<Image>().eq("file_id", userFile.getFileId()));
 
         if ("mp3".equalsIgnoreCase(userFile.getExtendName()) || "flac".equalsIgnoreCase(userFile.getExtendName())) {
             if (music == null) {
                 fileDealComp.parseMusicFile(userFile.getExtendName(), fileBean.getStorageType(), fileBean.getFileUrl(), fileBean.getFileId());
-                music = musicMapper.selectOne(new QueryWrapper<Music>().eq("fileId", userFile.getFileId()));
+                music = musicMapper.selectOne(new QueryWrapper<Music>().eq("file_id", userFile.getFileId()));
             }
         }
 

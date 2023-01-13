@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface IFiletransferService {
 
-    UploadFileVo uploadFileSpeed(UploadFileDTO uploadFileDTO);
+    UploadFileVo uploadFileSpeed(UploadFileDTO uploadFileDTO,Long userId);
 
     void uploadFile(HttpServletRequest request, UploadFileDTO UploadFileDto, Long userId);
 

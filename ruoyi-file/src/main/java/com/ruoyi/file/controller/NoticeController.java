@@ -2,6 +2,7 @@ package com.ruoyi.file.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.qiwenshare.common.result.RestResult;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.file.api.INoticeService;
 import com.ruoyi.file.domain.Notice;
 import com.ruoyi.file.dto.notice.NoticeListDTO;
@@ -30,12 +31,12 @@ public class NoticeController {
     @Operation(summary = "得到所有的公告列表", tags = {"公告管理"})
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
-    public RestResult<Map> selectUserList(@Parameter(description = "当前页，从1开始")  @RequestParam(defaultValue = "1") int page,
-                                          @Parameter(description = "页大小")  @RequestParam(defaultValue = "10") int pageSize,
-                                          @Parameter(description = "标题") @RequestParam(required = false) String title,
-                                          @Parameter(description = "发布者")  @RequestParam(required = false) Long publisher,
-                                          @Parameter(description = "开始发布时间")  @RequestParam(required = false) String beginTime,
-                                          @Parameter(description = "开始发布时间")  @RequestParam(required = false) String endTime) {
+    public AjaxResult selectUserList(@Parameter(description = "当前页，从1开始")  @RequestParam(defaultValue = "1") int page,
+                                     @Parameter(description = "页大小")  @RequestParam(defaultValue = "10") int pageSize,
+                                     @Parameter(description = "标题") @RequestParam(required = false) String title,
+                                     @Parameter(description = "发布者")  @RequestParam(required = false) Long publisher,
+                                     @Parameter(description = "开始发布时间")  @RequestParam(required = false) String beginTime,
+                                     @Parameter(description = "开始发布时间")  @RequestParam(required = false) String endTime) {
         NoticeListDTO noticeListDTO = new NoticeListDTO();
         noticeListDTO.setPage(page);
         noticeListDTO.setPageSize(pageSize);
@@ -49,18 +50,18 @@ public class NoticeController {
         Map<String, Object> map = new HashMap<>();
         map.put("total", noticeIPage.getTotal());
         map.put("list", noticeIPage.getRecords());
-        return RestResult.success().data(map);
+        return AjaxResult.success(map);
     }
 
     @Operation(summary = "查询公告详情", tags = {"公告管理"})
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @ResponseBody
-    public RestResult<Notice> getNoticeDetail(@Parameter(description = "公告id", required = true) long noticeId) {
+    public AjaxResult getNoticeDetail(@Parameter(description = "公告id", required = true) long noticeId) {
         RestResult<Notice> result = new RestResult<Notice>();
 
         Notice notice = noticeService.getById(noticeId);
 
-        return RestResult.success().data(notice);
+        return AjaxResult.success(notice);
     }
 
 

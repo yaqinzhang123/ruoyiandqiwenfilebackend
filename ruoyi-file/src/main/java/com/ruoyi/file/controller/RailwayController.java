@@ -2,6 +2,7 @@ package com.ruoyi.file.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.qiwenshare.common.anno.MyLog;
 import com.qiwenshare.common.result.RestResult;
@@ -24,6 +25,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,10 +45,25 @@ public class RailwayController {
     @Operation(summary = "测试", description = "测试")
     @RequestMapping(value = "/selectByMainCode", method = RequestMethod.GET)
     @ResponseBody
-    public RestResult<GangGui> test(
+    public RestResult<GangGui> selectByMainCode(
             @Parameter(description = "code", required = true) String code){
        List<GangGui> fileList=gangGuiService.selectByMainCode(code);
         return RestResult.success().data(fileList);
+
+    }
+    @Operation(summary = "测试", description = "测试")
+    @RequestMapping(value = "/getList", method = RequestMethod.GET)
+    @ResponseBody
+    public RestResult<T> getList(
+            @Parameter(description = "type", required = true) String type){
+        List<Object> result=new ArrayList<>();
+
+        if(type.toLowerCase().equals("ganggui")){
+            LambdaQueryWrapper<GangGui> lambdaQueryWrapper=new LambdaQueryWrapper<>();
+            List<GangGui> result2=gangGuiService.list();
+            return RestResult.success().data(result2);
+        }
+        return RestResult.success().data(result);
 
     }
 }

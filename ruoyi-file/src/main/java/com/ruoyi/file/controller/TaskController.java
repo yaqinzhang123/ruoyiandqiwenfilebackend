@@ -49,9 +49,9 @@ public class TaskController {
             }
         }
         userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("deleteFlag", 0));
-        for (UserFile userFile : userfileList) {
-            fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
-        }
+//        for (UserFile userFile : userfileList) {
+//            fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+//        }
 
     }
 

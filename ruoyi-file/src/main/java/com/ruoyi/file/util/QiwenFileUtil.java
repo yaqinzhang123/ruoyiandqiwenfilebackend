@@ -40,6 +40,7 @@ public class QiwenFileUtil {
 
     public static UserFile searchQiwenFileParam(UserFile userFile) {
         UserFile param = new UserFile();
+        
         param.setFilePath(QiwenFile.formatPath(userFile.getFilePath()));
         param.setFileName(userFile.getFileName());
         param.setExtendName(userFile.getExtendName());
