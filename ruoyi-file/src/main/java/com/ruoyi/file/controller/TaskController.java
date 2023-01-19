@@ -11,6 +11,7 @@ import com.ruoyi.file.service.UserFileService;
 import com.ruoyi.framework.web.service.WebSocketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Slf4j
 @Controller
+@EnableScheduling
 public class TaskController {
 
     @Resource
@@ -34,7 +36,7 @@ public class TaskController {
 
     @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
     public void updateElasticSearch() {
-        List<UserFile> userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("deleteFlag", 0));
+        List<UserFile> userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("delete_flag", 0));
         for (int i = 0; i < userfileList.size(); i++) {
             try {
 
@@ -48,7 +50,7 @@ public class TaskController {
                 log.error(e.getMessage());
             }
         }
-        userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("deleteFlag", 0));
+        userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("delete_flag", 0));
 //        for (UserFile userFile : userfileList) {
 //            fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
 //        }
@@ -85,9 +87,9 @@ public class TaskController {
         }
     }
 
-    @Scheduled(cron = "*/5 * * * * ?")
-    private void pushAlarm() throws IOException {
-        System.out.println("开始执行");
-        webSocketService.sendAllMessages("告警推送");
-    }
+//    @Scheduled(cron = "*/5 * * * * ?")
+//    private void pushAlarm() throws IOException {
+//        System.out.println("开始执行");
+//        webSocketService.sendAllMessages("告警推送");
+//    }
 }

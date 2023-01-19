@@ -20,12 +20,12 @@ import com.ruoyi.file.domain.UserFile;
 import com.ruoyi.file.dto.file.CreateOfficeFileDTO;
 import com.ruoyi.file.dto.file.EditOfficeFileDTO;
 import com.ruoyi.file.dto.file.PreviewOfficeFileDTO;
-import com.ruoyi.file.helper.ConfigManager;
 import com.ruoyi.file.util.FileModel;
 import com.qiwenshare.ufop.factory.UFOPFactory;
 import com.qiwenshare.ufop.operation.copy.Copier;
 import com.qiwenshare.ufop.operation.copy.domain.CopyFile;
 import com.qiwenshare.ufop.operation.download.domain.DownloadFile;
+import com.ruoyi.framework.web.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -63,12 +63,18 @@ public class OfficeController {
     private String port;
     @Value("${ufop.storage-type}")
     private Integer storageType;
+    @Value("${files.docservice.url.site}")
+    private String filesDocSite;
+    @Value("${files.docservice.url.api}")
+    private String filesDocApi;
 
 
     @Resource
     IFileService fileService;
     @Resource
     IUserFileService userFileService;
+    @Resource
+    private TokenService tokenService;
 
     @Operation(summary = "创建office文件", description = "创建office文件", tags = {"office"})
     @ResponseBody
@@ -135,37 +141,40 @@ public class OfficeController {
     @Operation(summary = "预览office文件", description = "预览office文件", tags = {"office"})
     @RequestMapping(value = "/previewofficefile", method = RequestMethod.POST)
     @ResponseBody
-    public AjaxResult previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO, @RequestHeader("token") String token) {
+    public AjaxResult previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
         try {
 
             LoginUser loginUser =  SecurityUtils.getLoginUser();
             UserFile userFile = userFileService.getById(previewOfficeFileDTO.getUserFileId());
             String baseUrl = request.getScheme()+"://"+ deploymentHost + ":" + port + request.getContextPath();
+            String token= loginUser.getToken();
             String query = "?type=show&token="+token;
+            String username= loginUser.getUser()!=null? loginUser.getUser().getUserName():null;
             String callbackUrl = baseUrl + "/office/IndexServlet" + query;
             FileModel file = new FileModel(userFile.getUserFileId(),
                     userFile.getFileName() + "." + userFile.getExtendName(),
                     previewOfficeFileDTO.getPreviewUrl(),
                     userFile.getUploadTime(),
                     String.valueOf(loginUser.getUserId()),
-                    loginUser.getUsername(),
+                    username,
                     callbackUrl,
                     "view");
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("file",file);
-            jsonObject.put("docserviceApiUrl", ConfigManager.GetProperty("files.docservice.url.site") + ConfigManager.GetProperty("files.docservice.url.api"));
+            jsonObject.put("docserviceApiUrl", filesDocSite+ filesDocApi);
             jsonObject.put("reportName",userFile.getFileName());
             return AjaxResult.success("获取报告成功！",jsonObject);
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return AjaxResult.success("服务器错误！",e.getMessage());
         }
     }
     @Operation(summary = "编辑office文件", description = "编辑office文件", tags = {"office"})
     @ResponseBody
     @RequestMapping(value = "/editofficefile", method = RequestMethod.POST)
-    public AjaxResult editOfficeFile(HttpServletRequest request, @RequestBody EditOfficeFileDTO editOfficeFileDTO, @RequestHeader("token") String token) {
+    public AjaxResult editOfficeFile(HttpServletRequest request, @RequestBody EditOfficeFileDTO editOfficeFileDTO) {
         log.info("editOfficeFile");
         try {
 
@@ -175,7 +184,7 @@ public class OfficeController {
             String baseUrl = request.getScheme()+"://"+ deploymentHost + ":" + port + request.getContextPath();
 
             log.info("回调地址baseUrl：" + baseUrl);
-            String query = "?type=edit&userFileId="+userFile.getUserFileId()+"&token="+token;
+            String query = "?type=edit&userFileId="+userFile.getUserFileId()+"&token="+loginUser.getToken();
             String callbackUrl = baseUrl + "/office/IndexServlet" + query;
 
             FileModel file = new FileModel(userFile.getUserFileId(),
@@ -183,13 +192,13 @@ public class OfficeController {
                     editOfficeFileDTO.getPreviewUrl(),
                     userFile.getUploadTime(),
                     String.valueOf(loginUser.getUserId()),
-                    loginUser.getUsername(),
+                    loginUser.getUser().getUserName(),
                     callbackUrl,
                     "edit");
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("file",file);
-            jsonObject.put("docserviceApiUrl",ConfigManager.GetProperty("files.docservice.url.site") + ConfigManager.GetProperty("files.docservice.url.api"));
+            jsonObject.put("docserviceApiUrl",filesDocSite+filesDocApi);
             jsonObject.put("reportName",userFile.getFileName());
             return AjaxResult.success("编辑报告成功！",jsonObject);
         } catch (Exception e) {

@@ -22,7 +22,7 @@ public class UploadTaskDetail {
     private String filePath;
 
     @Column(columnDefinition="varchar(100) comment '文件名称'")
-    private String filename;
+    private String fileName;
 
     @Column(columnDefinition="int(5) comment '当前分片数'")
     private int chunkNumber;

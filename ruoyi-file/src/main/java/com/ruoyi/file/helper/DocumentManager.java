@@ -21,6 +21,7 @@ package com.ruoyi.file.helper;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.file.service.OfficeConverterService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,6 +41,50 @@ public class DocumentManager
 
     @Resource
     private OfficeConverterService officeConverterService;
+
+
+    private static String filesSizeMax;
+    @Value("${filesize-max}")
+    public void setFilesSizeMax(String filesSizeMax) {
+        this.filesSizeMax = filesSizeMax;
+    }
+
+
+    private static String filesDocViewed;
+    @Value("${files.docservice.viewed-docs}")
+    public void setFilesDocViewed(String filesDocViewed) {
+        this.filesDocViewed = filesDocViewed;
+    }
+    private static String filesDocEdited;
+    @Value("${files.docservice.edited-docs}")
+    public void setFilesDocEdited(String filesDocEdited) {
+        this.filesDocEdited = filesDocEdited;
+    }
+    private static String filesDocConvert;
+    @Value("${files.docservice.convert-docs}")
+    public void setFilesDocConvert(String filesDocConvert) {
+        this.filesDocConvert = filesDocConvert;
+    }
+
+
+    private static String storgeFolder;
+    @Value("${storage-folder}")
+    public void setStorgeFolder(String storgeFolder) {
+        this.storgeFolder = storgeFolder;
+    }
+    private static String filesDocExample;
+    @Value("${files.docservice.url.example}")
+    public void setFilesDocExample(String filesDocExample) {
+        this.filesDocExample = filesDocExample;
+    }
+
+
+    private static String filesDocSecret;
+    @Value("${files.docservice.secret}")
+    public void setFilesDocSecret(String filesDocSecret) {
+        this.filesDocSecret = filesDocSecret;
+    }
+
     private static HttpServletRequest request;
 
     public static void Init(HttpServletRequest req, HttpServletResponse resp)
@@ -53,7 +98,7 @@ public class DocumentManager
 
         try
         {
-            size = Long.parseLong(ConfigManager.GetProperty("filesize-max"));
+            size = Long.parseLong(filesSizeMax);
         }
         catch (Exception ex)
         {
@@ -76,19 +121,19 @@ public class DocumentManager
 
     public static List<String> GetViewedExts()
     {
-        String exts = ConfigManager.GetProperty("files.docservice.viewed-docs");
+        String exts = filesDocViewed;
         return Arrays.asList(exts.split("\\|"));
     }
 
     public static List<String> GetEditedExts()
     {
-        String exts = ConfigManager.GetProperty("files.docservice.edited-docs");
+        String exts = filesDocEdited;
         return Arrays.asList(exts.split("\\|"));
     }
 
     public static List<String> GetConvertExts()
     {
-        String exts = ConfigManager.GetProperty("files.docservice.convert-docs");
+        String exts = filesDocConvert;
         return Arrays.asList(exts.split("\\|"));
     }
 
@@ -113,7 +158,7 @@ public class DocumentManager
     {
         String hostAddress = CurUserHostAddress(userAddress);
         String serverPath = request.getSession().getServletContext().getRealPath("");
-        String storagePath = ConfigManager.GetProperty("storage-folder");
+        String storagePath = storgeFolder;
         String directory = serverPath + storagePath + File.separator + hostAddress + File.separator;
 
         File file = new File(directory);
@@ -136,7 +181,7 @@ public class DocumentManager
     {
         String hostAddress = CurUserHostAddress(userAddress);
         String serverPath = request.getSession().getServletContext().getRealPath("");
-        String storagePath = ConfigManager.GetProperty("storage-folder");
+        String storagePath = storgeFolder;
 
         String directory = serverPath + storagePath + File.separator + hostAddress + File.separator;
 
@@ -277,7 +322,7 @@ public class DocumentManager
         try
         {
             String serverPath = GetServerUrl(forDocumentServer);
-            String storagePath = ConfigManager.GetProperty("storage-folder");
+            String storagePath = storgeFolder;
             String hostAddress = CurUserHostAddress(null);
 
             String filePath = serverPath + "/" + storagePath + "/" + hostAddress + "/" + URLEncoder.encode(fileName, java.nio.charset.StandardCharsets.UTF_8.toString()).replace("+", "%20");
@@ -323,7 +368,7 @@ public class DocumentManager
     public static String GetPathUri(String path)
     {
         String serverPath = GetServerUrl(true);
-        String storagePath = ConfigManager.GetProperty("storage-folder");
+        String storagePath = storgeFolder;
         String hostAddress = CurUserHostAddress(null);
 
         String filePath = serverPath + "/" + storagePath + "/" + hostAddress + "/" + path.replace(File.separator, "/").substring(FilesRootPath(null).length()).replace(" ", "%20");
@@ -333,8 +378,8 @@ public class DocumentManager
 
 
     public static String GetServerUrl(Boolean forDocumentServer) {
-        if (forDocumentServer && !ConfigManager.GetProperty("files.docservice.url.example").equals("")) {
-            return ConfigManager.GetProperty("files.docservice.url.example");
+        if (forDocumentServer && !filesDocExample.equals("")) {
+            return filesDocExample;
         } else {
             return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         }
@@ -364,6 +409,6 @@ public class DocumentManager
 
     private static String GetTokenSecret()
     {
-        return ConfigManager.GetProperty("files.docservice.secret");
+        return filesDocSecret;
     }
 }

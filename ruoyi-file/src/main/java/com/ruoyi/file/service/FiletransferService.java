@@ -36,6 +36,7 @@ import com.qiwenshare.ufop.operation.upload.domain.UploadFileResult;
 import com.qiwenshare.ufop.util.UFOPUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -190,6 +191,9 @@ public class FiletransferService implements IFiletransferService {
                     String fileName = fileDealComp.getRepeatFileName(userFile, userFile.getFilePath());
                     userFile.setFileName(fileName);
                 }
+                if(StringUtils.isEmpty(userFile.getFilePath())){
+                    userFile.setFilePath("/");
+                }
                 userFileMapper.insert(userFile);
 
                 if (relativePath.contains("/")) {
@@ -227,7 +231,7 @@ public class FiletransferService implements IFiletransferService {
             } else if (UploadFileStatusEnum.UNCOMPLATE.equals(uploadFileResult.getStatus())) {
                 UploadTaskDetail uploadTaskDetail = new UploadTaskDetail();
                 uploadTaskDetail.setFilePath(qiwenFile.getParent());
-                uploadTaskDetail.setFilename(qiwenFile.getNameNotExtend());
+                uploadTaskDetail.setFileName(qiwenFile.getNameNotExtend());
                 uploadTaskDetail.setChunkNumber(uploadFileDto.getChunkNumber());
                 uploadTaskDetail.setChunkSize((int)uploadFileDto.getChunkSize());
                 uploadTaskDetail.setRelativePath(uploadFileDto.getRelativePath());

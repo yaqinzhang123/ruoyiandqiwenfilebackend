@@ -19,28 +19,27 @@
 package com.ruoyi.file.service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.google.gson.Gson;
-import com.ruoyi.file.helper.ConfigManager;
-import com.ruoyi.file.helper.DocumentManager;
-import com.ruoyi.file.helper.FileUtility;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 
 @Component
 public class OfficeConverterService
 {
 
+    @Value("${files.docservice.url.site}")
+    private static String filesDocSite;
+    @Value("${files.docservice.url.converter}")
+    private static String filesDocConverter;
+    @Value("${files.docservice.header}")
+    private static String filesDocHeader;
+    @Value("${files.docservice.timeout}")
+    private static String filesDocTimeout;
     private static int ConvertTimeout = 120000;
-    private static final String DocumentConverterUrl = ConfigManager.GetProperty("files.docservice.url.site") + ConfigManager.GetProperty("files.docservice.url.converter");
-    private static final String DocumentJwtHeader = ConfigManager.GetProperty("files.docservice.header");
+    private static final String DocumentConverterUrl = filesDocSite + filesDocConverter;
+    private static final String DocumentJwtHeader = filesDocHeader;
 
     public static class ConvertBody
     {
@@ -58,7 +57,7 @@ public class OfficeConverterService
     {
         try
         {
-            int timeout = Integer.parseInt(ConfigManager.GetProperty("files.docservice.timeout"));
+            int timeout = Integer.parseInt(filesDocTimeout);
             if (timeout > 0) 
             {
                 ConvertTimeout = timeout;

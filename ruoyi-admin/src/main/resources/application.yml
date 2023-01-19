@@ -183,3 +183,5 @@ files:
       api: web-apps/apps/api/documents/api.js
       preloader: web-apps/apps/api/documents/cache-scripts.html
       example:
+    secret:
+    header: Authorization
