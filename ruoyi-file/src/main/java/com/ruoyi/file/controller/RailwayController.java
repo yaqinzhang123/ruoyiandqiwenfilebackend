@@ -11,6 +11,7 @@ import com.qiwenshare.common.util.security.SessionUtil;
 import com.ruoyi.file.api.ICommonFileService;
 import com.ruoyi.file.api.IFilePermissionService;
 import com.ruoyi.file.api.IGangGuiService;
+import com.ruoyi.file.api.IGuiZhenService;
 import com.ruoyi.file.api.IUserFileService;
 import com.ruoyi.file.domain.CommonFile;
 import com.ruoyi.file.domain.FilePermission;
@@ -41,6 +42,8 @@ public class RailwayController {
 
     @Resource
     IGangGuiService gangGuiService;
+    @Resource
+    IGuiZhenService guiZhenService;
 
     @Operation(summary = "测试", description = "测试")
     @RequestMapping(value = "/selectByMainCode", method = RequestMethod.GET)
@@ -61,6 +64,10 @@ public class RailwayController {
         if(type.toLowerCase().equals("ganggui")){
             LambdaQueryWrapper<GangGui> lambdaQueryWrapper=new LambdaQueryWrapper<>();
             List<GangGui> result2=gangGuiService.list();
+            return RestResult.success().data(result2);
+        }else if(type.toLowerCase().equals("guizhen")){
+            LambdaQueryWrapper<GuiZhen> lambdaQueryWrapper=new LambdaQueryWrapper<>();
+            List<GuiZhen> result2=guiZhenService.list();
             return RestResult.success().data(result2);
         }
         return RestResult.success().data(result);
