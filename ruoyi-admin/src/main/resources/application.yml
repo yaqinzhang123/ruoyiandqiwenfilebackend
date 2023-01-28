@@ -154,7 +154,12 @@ ufop:
       access-key-id:
       access-key-secret:
       bucket-name:
-
+  #MinIO基本配置
+  minio:
+    endpoint: http://127.0.0.1:9000
+    access-key:
+    secret-key:
+    bucket-name:
 
 
 # 奇文网盘版本
