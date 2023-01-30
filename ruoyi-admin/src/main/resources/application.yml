@@ -136,9 +136,9 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 ####奇文网盘所需配置###
-#存储类型
+#存储类型 1 阿里云oss对象存储，2FastDFS存储，3 minIO存储，4七牛云KODO 对象存储
 ufop:
-  storage-type: 0
+  storage-type: 3
   #文件存储路径
   local-storage-path:
   bucket-name: upload
@@ -154,12 +154,30 @@ ufop:
       access-key-id:
       access-key-secret:
       bucket-name:
+  #FastDFS存储基本配置
+  fdfs:
+    so-timeout: 15000
+    connect-timeout: 15000
+    pool:
+      max-total: 200
+      max-total-per-key: 50
+      max-wait-millis: 5000
+      tracker-list: 127.0.0.1:22122
   #MinIO基本配置
   minio:
     endpoint: http://127.0.0.1:9000
-    access-key:
-    secret-key:
-    bucket-name:
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket-name: test
+
+  #七牛云Kodo配置
+  qiniuyun:
+    kodo:
+      domain:
+      endpoint:
+      access-key:
+      secret-key:
+      bucket-name:
 
 
 # 奇文网盘版本
