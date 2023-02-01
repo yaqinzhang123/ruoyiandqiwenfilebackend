@@ -1,6 +1,6 @@
 package com.ruoyi.file.controller;
 
-//import co.elastic.clients.elasticsearch.ElasticsearchClient;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.file.api.IShareFileService;
 import com.ruoyi.file.component.FileDealComp;
@@ -51,9 +51,9 @@ public class TaskController {
             }
         }
         userfileList = userFileService.list(new QueryWrapper<UserFile>().eq("delete_flag", 0));
-//        for (UserFile userFile : userfileList) {
-//            fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
-//        }
+        for (UserFile userFile : userfileList) {
+            fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+        }
 
     }
 

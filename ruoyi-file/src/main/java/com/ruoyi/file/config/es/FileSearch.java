@@ -23,4 +23,21 @@ public class FileSearch {
     private Integer deleteFlag;
     private String deleteTime;
     private String deleteBatchNum;
+//    private String index_name;
+//    private String user_file_id;
+//    private String file_id;
+//    private String file_name;
+//    private String content;
+//    private String file_url;
+//    private Long file_size;
+//    private Integer storage_type;
+//    private String identifier;
+//    private Long user_id;
+//    private String file_path;
+//    private String extend_name;
+//    private Integer is_dir;
+//    private String upload_time;
+//    private Integer delete_flag;
+//    private String delete_time;
+//    private String delete_batch_num;
 }

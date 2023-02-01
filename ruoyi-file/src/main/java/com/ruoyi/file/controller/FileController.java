@@ -1,7 +1,6 @@
 package com.ruoyi.file.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-//import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HighlighterEncoder;
@@ -63,7 +62,7 @@ public class FileController extends BaseController {
     FileDealComp fileDealComp;
     @Resource
     AsyncTaskComp asyncTaskComp;
-    @Autowired
+    @Resource
     private ElasticsearchClient elasticsearchClient;
 
     public static final String CURRENT_MODULE = "文件接口";
@@ -86,7 +85,7 @@ public class FileController extends BaseController {
         UserFile userFile = QiwenFileUtil.getQiwenDir(sessionUserBean.getUserId(), createFileDto.getFilePath(), createFileDto.getFileName());
 
         userFileService.save(userFile);
-//        fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+        fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
         return AjaxResult.success();
     }
 
@@ -110,11 +109,11 @@ public class FileController extends BaseController {
                                                     .bool(_4 -> _4
                                                             .should(_5 -> _5
                                                                     .match(_6 -> _6
-                                                                            .field("file_name")
+                                                                            .field("fileName")
                                                                             .query(searchFileDTO.getFileName())))
                                                             .should(_5 -> _5
                                                                     .wildcard(_6 -> _6
-                                                                            .field("file_name")
+                                                                            .field("fileName")
                                                                             .wildcard("*" + searchFileDTO.getFileName() + "*")))
                                                             .should(_5 -> _5
                                                                     .match(_6 -> _6
@@ -127,13 +126,13 @@ public class FileController extends BaseController {
                                                     ))
                                             .must(_3 -> _3
                                                     .term(_4 -> _4
-                                                            .field("user_id")
+                                                            .field("userId")
                                                             .value(sessionUserBean.getUserId())))
                                     ))
                             .from(currentPage)
                             .size(pageCount)
                             .highlight(h -> h
-                                    .fields("file_name", f -> f.type("plain")
+                                    .fields("fileName", f -> f.type("plain")
                                             .preTags("<span class='keyword'>").postTags("</span>"))
                                     .encoder(HighlighterEncoder.Html))
                             ,
@@ -188,7 +187,7 @@ public class FileController extends BaseController {
                 userFileService.updateById(newUserFile);
             }
         }
-//        fileDealComp.uploadESByUserFileId(renameFileDto.getUserFileId());
+        fileDealComp.uploadESByUserFileId(renameFileDto.getUserFileId());
         return AjaxResult.success();
     }
 

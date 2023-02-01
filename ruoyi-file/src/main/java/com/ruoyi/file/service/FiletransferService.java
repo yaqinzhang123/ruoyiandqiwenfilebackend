@@ -107,7 +107,7 @@ public class FiletransferService implements IFiletransferService {
             List<UserFile> userFileList = userFileMapper.selectList(new QueryWrapper<>(param1));
             if (userFileList.size() <= 0) {
                 userFileMapper.insert(userFile);
-//                fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+                fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
             }
             if (relativePath.contains("/")) {
                 fileDealComp.restoreParentFilePath(qiwenFile, userId);

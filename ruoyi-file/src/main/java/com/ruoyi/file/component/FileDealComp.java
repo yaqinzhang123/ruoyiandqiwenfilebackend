@@ -311,9 +311,9 @@ public class FileDealComp {
     public void deleteESByUserFileId(String userFileId) {
         exec.execute(()->{
             try {
-//                elasticsearchClient.delete(d -> d
-//                        .index("filesearch")
-//                        .id(userFileId));
+                elasticsearchClient.delete(d -> d
+                        .index("filesearch")
+                        .id(userFileId));
             } catch (Exception e) {
                 log.debug("ES删除操作失败，请检查配置");
             }
