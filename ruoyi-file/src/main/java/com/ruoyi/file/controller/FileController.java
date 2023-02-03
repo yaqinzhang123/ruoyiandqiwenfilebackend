@@ -200,7 +200,8 @@ public class FileController extends BaseController {
             @Parameter(description = "页面数量", required = true) long pageCount){
 
 
-        IPage<FileListVo> fileList = userFileService.userFileList(null, filePath, currentPage, pageCount);
+//        IPage<FileListVo> fileList = userFileService.userFileList(null, filePath, currentPage, pageCount);
+        IPage<FileListVo> fileList = userFileService.userFileListByDept(null, filePath, currentPage, pageCount);
         Map<String, Object> map = new HashMap<>();
         if(fileList==null){
             map.put("total", 0);

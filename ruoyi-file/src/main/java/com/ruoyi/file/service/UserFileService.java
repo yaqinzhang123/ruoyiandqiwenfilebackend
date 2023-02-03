@@ -38,6 +38,7 @@ import java.util.concurrent.Executors;
 public class UserFileService extends ServiceImpl<UserFileMapper, UserFile> implements IUserFileService {
     @Resource
     UserFileMapper userFileMapper;
+
     @Resource
     RecoveryFileMapper recoveryFileMapper;
     @Resource
@@ -81,6 +82,17 @@ public class UserFileService extends ServiceImpl<UserFileMapper, UserFile> imple
 
         userFile.setFilePath(URLDecoder.decodeForPath(filePath, StandardCharsets.UTF_8));
         return userFileMapper.selectPageVo(page, userFile, null);
+    }
+    @Override
+    public IPage<FileListVo> userFileListByDept(Long deptId, String filePath, Long currentPage, Long pageCount) {
+        Page<FileListVo> page = new Page<>(currentPage, pageCount);
+        UserFile userFile = new UserFile();
+        Long sessionDeptId= SecurityUtils.getDeptId();
+        if (deptId == null) {
+            deptId=sessionDeptId;
+        }
+        userFile.setFilePath(URLDecoder.decodeForPath(filePath, StandardCharsets.UTF_8));
+        return userFileMapper.selectByDeptPageVo(page, userFile,deptId, null);
     }
 
     @Override
