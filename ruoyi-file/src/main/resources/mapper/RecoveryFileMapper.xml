@@ -10,6 +10,12 @@
         SELECT * FROM recoveryfile a
         LEFT JOIN userfile b ON a.user_file_id = b.user_file_id
         left join file c on c.file_id = b.file_id
-        WHERE user_id = #{userId}
+        WHERE user_id =#{userId}
+    </select>
+    <select id="selectRecoveryFileListByDeptId" resultType="com.ruoyi.file.vo.file.RecoveryFileListVo">
+        SELECT * FROM recoveryfile a
+                          LEFT JOIN userfile b ON a.user_file_id = b.user_file_id
+                          left join file c on c.file_id = b.file_id
+        WHERE user_id in (select user_id from sys_user where dept_id=#{deptId})
     </select>
 </mapper>

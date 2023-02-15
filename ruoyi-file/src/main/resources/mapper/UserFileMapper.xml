@@ -82,10 +82,33 @@
         where (file_path = #{filePath} or file_path like concat(#{filePath},'/%')) and user_id = #{userId} and delete_flag = 0
     </select>
 
+    <select id="selectUserFileByLikeRightFilePathDeptId" resultType="com.ruoyi.file.domain.UserFile">
+        select * from userfile
+        where (file_path = #{filePath} or file_path like concat(#{filePath},'/%'))
+        <if test="deptId != null">
+        and a.user_id in (select user_id from sys_user where dept_id = #{deptId})
+        </if>
+         and delete_flag = 0
+    </select>
+
     <select id="selectStorageSizeByUserId" resultType="java.lang.Long" parameterType="java.lang.Long">
         SELECT SUM(file_size) FROM userfile
         LEFT JOIN file ON file.file_id = userfile.file_id
         WHERE userfile.user_id = #{userId}
     </select>
 
+    <select id="selectStorageSizeByUserIdDept" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT SUM(file_size) FROM userfile
+                                       LEFT JOIN file ON file.file_id = userfile.file_id
+        WHERE userfile.user_id in (select user_id from sys_user where dept_id = #{deptId})
+    </select>
+
+    <select id="selectFilePathTreeByDeptId" resultType="com.ruoyi.file.domain.UserFile">
+        select * from userfile
+        where is_dir=1
+        <if test="deptId != null">
+            and user_id in (select user_id from sys_user where dept_id = #{deptId})
+        </if>
+        and delete_flag = 0
+    </select>
 </mapper>

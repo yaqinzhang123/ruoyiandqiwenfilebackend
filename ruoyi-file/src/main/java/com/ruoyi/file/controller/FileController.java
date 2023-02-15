@@ -368,7 +368,7 @@ public class FileController extends BaseController {
 
         LoginUser sessionUserBean =  SecurityUtils.getLoginUser();
 
-        List<UserFile> userFileList = userFileService.selectFilePathTreeByUserId(sessionUserBean.getUserId());
+        List<UserFile> userFileList = userFileService.selectFilePathTreeByDeptId(sessionUserBean.getDeptId());
         TreeNode resultTreeNode = new TreeNode();
         resultTreeNode.setLabel(QiwenFile.separator);
         resultTreeNode.setId(0L);

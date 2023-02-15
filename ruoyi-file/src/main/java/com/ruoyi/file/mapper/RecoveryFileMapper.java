@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface RecoveryFileMapper extends BaseMapper<RecoveryFile> {
     List<RecoveryFileListVo> selectRecoveryFileList(@Param("userId") Long userId);
+    List<RecoveryFileListVo> selectRecoveryFileListByDeptId(@Param("deptId") Long deptId);
 }

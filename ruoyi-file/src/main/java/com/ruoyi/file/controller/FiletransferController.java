@@ -1,5 +1,15 @@
 package com.ruoyi.file.controller;
 
+import com.aspose.cad.CodePages;
+import com.aspose.cad.InterpolationMode;
+import com.aspose.cad.SmoothingMode;
+import com.aspose.cad.TextRenderingHint;
+import com.aspose.cad.fileformats.cad.CadDrawTypeMode;
+import com.aspose.cad.imageoptions.CadRasterizationOptions;
+import com.aspose.cad.imageoptions.PdfOptions;
+import com.aspose.cad.imageoptions.UnitType;
+import com.aspose.cad.Image;
+import com.aspose.cad.LoadOptions;
 import com.qiwenshare.common.anno.MyLog;
 import com.qiwenshare.common.result.RestResult;
 import com.qiwenshare.common.util.MimeUtils;
@@ -266,20 +276,32 @@ public class FiletransferController {
         }
 
     }
+    @Operation(summary = "预览DWG", description = "预览DWG", tags = {"filetransfer"})
+    @RequestMapping(value = "/previewerDWG", method = RequestMethod.GET)
+    @ResponseBody
+    public AjaxResult previewerDWG(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,  InputStream inputStream) {
+
+        String sourcePath = "F:\\00.dwg";
+        String targetPath = "F:\\1.pdf";
+
+        filetransferService.previewFileDWG(inputStream);
+
+        return AjaxResult.success();
+    }
 
     @Operation(summary = "获取存储信息", description = "获取存储信息", tags = {"filetransfer"})
     @RequestMapping(value = "/getstorage", method = RequestMethod.GET)
     @ResponseBody
     public AjaxResult getStorage() {
-
+        // 将userid改为deptId
          LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         StorageBean storageBean = new StorageBean();
-        storageBean.setUserId(sessionUserBean.getUserId());
-        Long storageSize = filetransferService.selectStorageSizeByUserId(sessionUserBean.getUserId());
+        storageBean.setUserId(sessionUserBean.getDeptId());
+        Long storageSize = filetransferService.selectStorageSizeByUserIdDept(sessionUserBean.getDeptId());
         StorageBean storage = new StorageBean();
-        storage.setUserId(sessionUserBean.getUserId());
+        storage.setUserId(sessionUserBean.getDeptId());
         storage.setStorageSize(storageSize);
-        Long totalStorageSize = storageService.getTotalStorageSize(sessionUserBean.getUserId());
+        Long totalStorageSize = storageService.getTotalStorageSize(sessionUserBean.getDeptId());
         storage.setTotalStorageSize(totalStorageSize);
 
         return AjaxResult.success(storage);

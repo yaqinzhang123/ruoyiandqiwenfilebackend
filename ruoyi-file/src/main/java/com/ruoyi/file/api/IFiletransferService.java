@@ -8,6 +8,7 @@ import com.ruoyi.file.vo.file.UploadFileVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.util.List;
 
 public interface IFiletransferService {
@@ -19,8 +20,10 @@ public interface IFiletransferService {
     void downloadFile(HttpServletResponse httpServletResponse, DownloadFileDTO downloadFileDTO);
     void downloadUserFileList(HttpServletResponse httpServletResponse, String filePath, String fileName, List<String> userFileIds);
     void previewFile(HttpServletResponse httpServletResponse, PreviewDTO previewDTO);
+    void previewFileDWG(InputStream inputStream);
     void previewPictureFile(HttpServletResponse httpServletResponse, PreviewDTO previewDTO);
     void deleteFile(FileBean fileBean);
 
     Long selectStorageSizeByUserId(Long userId);
+    Long selectStorageSizeByUserIdDept(Long userId);
 }

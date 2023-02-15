@@ -542,4 +542,17 @@ public class SysUserServiceImpl implements ISysUserService
         }
         return successMsg.toString();
     }
+
+    @Override
+    public boolean checkUserDept(Long userId1, Long userId2) {
+        Long dept1=selectUserById(userId1).getDeptId();
+        Long dept2=selectUserById(userId2).getDeptId();
+        if(dept1==dept2)
+            return true;
+        return false;
+    }
+    @Override
+    public List<Long> selectDeptUserIds(Long userId) {
+        return userMapper.selectDeptUserIds(userId);
+    }
 }

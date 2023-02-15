@@ -65,5 +65,28 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-framework</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cad</artifactId>
+            <version>20.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
+            <version>20.1</version>
+        </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>svn-export-repo</id>
+            <name>svn-export repository on GitHub</name>
+            <url>http://bripkens.github.com/svg-export/repository/</url>
+        </repository>
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>https://repository.aspose.com/repo/</url>
+        </repository>
+    </repositories>
 </project>

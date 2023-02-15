@@ -26,6 +26,7 @@ import com.qiwenshare.ufop.operation.write.Writer;
 import com.qiwenshare.ufop.operation.write.domain.WriteFile;
 import com.qiwenshare.ufop.util.UFOPUtils;
 import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.system.service.ISysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +76,8 @@ public class FileDealComp {
     private MusicMapper musicMapper;
     @Resource
     private ElasticsearchClient elasticsearchClient;
+    @Resource
+    private ISysUserService sysUserService;
 
     public static Executor exec = Executors.newFixedThreadPool(10);
 
@@ -146,13 +149,13 @@ public class FileDealComp {
         while(qiwenFile.getParent() != null) {
             String fileName = qiwenFile.getName();
             String parentFilePath = qiwenFile.getParent();
-
+            List<Long> userList=sysUserService.selectDeptUserIds(sessionUserId);
             LambdaQueryWrapper<UserFile> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper.eq(UserFile::getFilePath, parentFilePath)
                     .eq(UserFile::getFileName, fileName)
                     .eq(UserFile::getDeleteFlag, 0)
                     .eq(UserFile::getIsDir, 1)
-                    .eq(UserFile::getUserId, sessionUserId);
+                    .in(UserFile::getUserId, userList);
             List<UserFile> userFileList = userFileMapper.selectList(lambdaQueryWrapper);
             if (userFileList.size() == 0) {
                 UserFile userFile = QiwenFileUtil.getQiwenDir(sessionUserId, parentFilePath, fileName);
@@ -181,12 +184,12 @@ public class FileDealComp {
     public void deleteRepeatSubDirFile(String filePath, Long sessionUserId) {
         log.debug("删除子目录："+filePath);
         LambdaQueryWrapper<UserFile> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-
+        List<Long> userList=sysUserService.selectDeptUserIds(sessionUserId);
         lambdaQueryWrapper.select(UserFile::getFileName, UserFile::getFilePath)
                 .likeRight(UserFile::getFilePath, QiwenFileUtil.formatLikePath(filePath))
                 .eq(UserFile::getIsDir, 1)
                 .eq(UserFile::getDeleteFlag, 0)
-                .eq(UserFile::getUserId, sessionUserId)
+                .in(UserFile::getUserId, userList)
                 .groupBy(UserFile::getFilePath, UserFile::getFileName)
                 .having("count(file_name) >= 2");
         List<UserFile> repeatList = userFileMapper.selectList(lambdaQueryWrapper);
@@ -347,8 +350,8 @@ public class FileDealComp {
             }
             log.debug("文件所属用户id：" + userFile.getUserId());
             log.debug("登录用户id:" + userId);
-            if (userFile.getUserId().longValue() != userId) {
-                log.info("用户id不一致，权限校验失败");
+            if (!sysUserService.checkUserDept(userId, userFile.getUserId())) {
+                log.info("用户所属部门id不一致，权限校验失败");
                 return false;
             }
         } else {

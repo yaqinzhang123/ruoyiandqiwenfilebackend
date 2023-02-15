@@ -20,8 +20,10 @@ public interface IUserFileService extends IService<UserFile> {
     IPage<FileListVo> getFileByFileType(Integer fileTypeId, Long currentPage, Long pageCount, long userId);
     List<UserFile> selectUserFileListByPath(String filePath, Long userId);
     List<UserFile> selectFilePathTreeByUserId(Long userId);
+    List<UserFile> selectFilePathTreeByDeptId(Long deptId);
     void deleteUserFile(String userFileId, Long sessionUserId);
 
     List<UserFile> selectUserFileByLikeRightFilePath(@Param("filePath") String filePath, @Param("userId") long userId);
+    List<UserFile> selectUserFileByLikeRightFilePathDeptId(@Param("filePath") String filePath, @Param("deptId") long deptId);
 
 }

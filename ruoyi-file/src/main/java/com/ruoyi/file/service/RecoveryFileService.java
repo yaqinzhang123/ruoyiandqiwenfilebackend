@@ -65,4 +65,8 @@ public class RecoveryFileService  extends ServiceImpl<RecoveryFileMapper, Recove
     public List<RecoveryFileListVo> selectRecoveryFileList(Long userId) {
         return recoveryFileMapper.selectRecoveryFileList(userId);
     }
+    @Override
+    public List<RecoveryFileListVo> selectRecoveryFileListByDeptId(Long deptId) {
+        return recoveryFileMapper.selectRecoveryFileListByDeptId(deptId);
+    }
 }

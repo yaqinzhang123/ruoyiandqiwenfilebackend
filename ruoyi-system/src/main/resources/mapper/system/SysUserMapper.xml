@@ -129,9 +129,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectUserVo"/>
 		where u.user_id = #{userId}
 	</select>
-	
-	<select id="checkUserNameUnique" parameterType="String" resultMap="SysUserResult">
-		select user_id, user_name from sys_user where user_name = #{userName} and del_flag = '0' limit 1
+	<select id="selectDeptUserIds" parameterType="Long" resultMap="SysUserResult">
+		select user_id from sys_user
+		where dept_id =(select dept_id from sys_user where user_id= #{userId})
 	</select>
 	
 	<select id="checkPhoneUnique" parameterType="String" resultMap="SysUserResult">
@@ -141,6 +141,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="checkEmailUnique" parameterType="String" resultMap="SysUserResult">
 		select user_id, email from sys_user where email = #{email} and del_flag = '0' limit 1
 	</select>
+	<select id="checkUserNameUnique" parameterType="String" resultMap="SysUserResult">
+		select user_id, user_name from sys_user where user_name = #{userName} and del_flag = '0' limit 1
+	</select>
+
 	
 	<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
  		insert into sys_user(

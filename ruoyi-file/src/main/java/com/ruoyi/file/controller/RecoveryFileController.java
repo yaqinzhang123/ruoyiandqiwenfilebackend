@@ -83,7 +83,7 @@ public class RecoveryFileController {
     public AjaxResult getRecoveryFileList() {
         LoginUser sessionUserBean= SecurityUtils.getLoginUser();
         RestResult<List<RecoveryFileListVo>> restResult = new RestResult<List<RecoveryFileListVo>>();
-        List<RecoveryFileListVo> recoveryFileList = recoveryFileService.selectRecoveryFileList(sessionUserBean.getUserId());
+        List<RecoveryFileListVo> recoveryFileList = recoveryFileService.selectRecoveryFileListByDeptId(sessionUserBean.getDeptId());
         return AjaxResult.success(recoveryFileList);
     }
 

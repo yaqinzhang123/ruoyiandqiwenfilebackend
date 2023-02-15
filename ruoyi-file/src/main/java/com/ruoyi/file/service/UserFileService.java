@@ -188,7 +188,10 @@ public class UserFileService extends ServiceImpl<UserFileMapper, UserFile> imple
                 .eq(UserFile::getDeleteFlag, 0);
         return userFileMapper.selectList(lambdaQueryWrapper);
     }
-
+    @Override
+    public List<UserFile> selectFilePathTreeByDeptId(Long deptId) {
+        return userFileMapper.selectFilePathTreeByDeptId(deptId);
+    }
 
     @Override
     public void deleteUserFile(String userFileId, Long sessionUserId) {
@@ -227,6 +230,10 @@ public class UserFileService extends ServiceImpl<UserFileMapper, UserFile> imple
     @Override
     public List<UserFile> selectUserFileByLikeRightFilePath(String filePath, long userId) {
         return userFileMapper.selectUserFileByLikeRightFilePath(filePath, userId);
+    }
+    @Override
+    public List<UserFile> selectUserFileByLikeRightFilePathDeptId(String filePath, long deptId) {
+        return userFileMapper.selectUserFileByLikeRightFilePath(filePath, deptId);
     }
 
     private void updateFileDeleteStateByFilePath(String filePath, String deleteBatchNum, Long userId) {

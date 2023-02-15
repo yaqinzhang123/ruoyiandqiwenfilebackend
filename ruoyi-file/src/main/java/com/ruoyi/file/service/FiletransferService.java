@@ -391,6 +391,12 @@ public class FiletransferService implements IFiletransferService {
     }
 
     @Override
+    public void previewFileDWG(InputStream inputStream) {
+
+    }
+
+
+    @Override
     public void previewFile(HttpServletResponse httpServletResponse, PreviewDTO previewDTO) {
         UserFile userFile = userFileMapper.selectById(previewDTO.getUserFileId());
         FileBean fileBean = fileMapper.selectById(userFile.getFileId());
@@ -474,5 +480,10 @@ public class FiletransferService implements IFiletransferService {
     @Override
     public Long selectStorageSizeByUserId(Long userId){
         return userFileMapper.selectStorageSizeByUserId(userId);
+    }
+
+    @Override
+    public Long selectStorageSizeByUserIdDept(Long deptId) {
+        return userFileMapper.selectStorageSizeByUserIdDept(deptId);
     }
 }

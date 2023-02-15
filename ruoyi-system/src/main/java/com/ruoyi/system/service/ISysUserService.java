@@ -203,4 +203,20 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 测试两个用户是否所属同一个部门
+     *
+     * @param userId1 用户id2
+     * @param userId2 用户id2
+     * @return 结果
+     */
+    public boolean checkUserDept(Long userId1,Long userId2);
+    /**
+     * 测试两个用户是否所属同一个部门
+     *
+     * @param userId 用户id
+     * @return 结果
+     */
+    public List<Long> selectDeptUserIds(Long userId);
 }
