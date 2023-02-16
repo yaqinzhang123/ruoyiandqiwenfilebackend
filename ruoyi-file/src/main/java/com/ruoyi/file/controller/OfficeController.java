@@ -212,7 +212,8 @@ public class OfficeController {
     @ResponseBody
     public void IndexServlet(HttpServletResponse response, HttpServletRequest request) throws IOException {
         String token = request.getParameter("token");
-        Long userId = 1l;
+        LoginUser user = tokenService.getLoginUserByToken(token);
+        Long userId=user==null?0L: user.getUserId();
         if (userId == null) {
             throw new NotLoginException();
         }

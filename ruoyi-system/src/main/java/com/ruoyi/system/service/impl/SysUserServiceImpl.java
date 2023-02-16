@@ -182,7 +182,7 @@ public class SysUserServiceImpl implements ISysUserService
      * 校验手机号码是否唯一
      *
      * @param user 用户信息
-     * @return
+     * @return 返回信息
      */
     @Override
     public String checkPhoneUnique(SysUser user)
@@ -200,7 +200,7 @@ public class SysUserServiceImpl implements ISysUserService
      * 校验email是否唯一
      *
      * @param user 用户信息
-     * @return
+     * @return 返回信息
      */
     @Override
     public String checkEmailUnique(SysUser user)
@@ -547,9 +547,7 @@ public class SysUserServiceImpl implements ISysUserService
     public boolean checkUserDept(Long userId1, Long userId2) {
         Long dept1=selectUserById(userId1).getDeptId();
         Long dept2=selectUserById(userId2).getDeptId();
-        if(dept1==dept2)
-            return true;
-        return false;
+        return dept1.equals(dept2)?true:false;
     }
     @Override
     public List<Long> selectDeptUserIds(Long userId) {

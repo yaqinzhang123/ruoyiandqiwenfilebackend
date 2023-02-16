@@ -50,10 +50,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -279,14 +276,23 @@ public class FiletransferController {
     @Operation(summary = "预览DWG", description = "预览DWG", tags = {"filetransfer"})
     @RequestMapping(value = "/previewerDWG", method = RequestMethod.GET)
     @ResponseBody
-    public AjaxResult previewerDWG(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,  InputStream inputStream) {
-
-        String sourcePath = "F:\\00.dwg";
-        String targetPath = "F:\\1.pdf";
-
-        filetransferService.previewFileDWG(inputStream);
-
-        return AjaxResult.success();
+    public void previewerDWG(HttpServletResponse httpServletResponse,  PreviewDTO previewDTO) {
+        UserFile userFile = userFileService.getById(previewDTO.getUserFileId());
+        FileBean fileBean = fileService.getById(userFile.getFileId());
+        String fileUrl = fileBean.getFileUrl();
+        String fileName = userFile.getFileName() + "." + userFile.getExtendName();
+        httpServletResponse.addHeader("Content-Disposition", "fileName=" + fileName);// 设置文件名
+        String mime = MimeUtils.getMime(userFile.getExtendName());
+        httpServletResponse.setHeader("Content-Type", mime);
+        Downloader downloader = ufopFactory.getDownloader(fileBean.getStorageType());
+        DownloadFile downloadFile = new DownloadFile();
+        downloadFile.setFileUrl(fileUrl);
+        InputStream inputStream = downloader.getInputStream(downloadFile);
+        try{
+            filetransferService.previewFileDWG(httpServletResponse, inputStream);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Operation(summary = "获取存储信息", description = "获取存储信息", tags = {"filetransfer"})

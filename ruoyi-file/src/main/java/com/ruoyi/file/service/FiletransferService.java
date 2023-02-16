@@ -1,5 +1,13 @@
 package com.ruoyi.file.service;
 
+import com.aspose.cad.InterpolationMode;
+import com.aspose.cad.SmoothingMode;
+import com.aspose.cad.TextRenderingHint;
+import com.aspose.cad.fileformats.cad.CadDrawTypeMode;
+import com.aspose.cad.imageoptions.CadRasterizationOptions;
+import com.aspose.cad.imageoptions.PdfOptions;
+import com.aspose.cad.imageoptions.UnitType;
+import com.aspose.pdf.operators.EX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -391,8 +399,38 @@ public class FiletransferService implements IFiletransferService {
     }
 
     @Override
-    public void previewFileDWG(InputStream inputStream) {
+    public void previewFileDWG( HttpServletResponse httpServletResponse, InputStream inputStream)   {
+        OutputStream outputStream=null;
+        try{
+        File file=asFile(inputStream,"dwg");
+        com.aspose.cad.Image objImage = com.aspose.cad.Image.load(inputStream);
+        PdfOptions pdfOptions = new PdfOptions();
+        CadRasterizationOptions cadRasterizationOptions = new CadRasterizationOptions();
+        cadRasterizationOptions.setPageHeight(1080);
+        cadRasterizationOptions.setPageWidth(1920);
+        cadRasterizationOptions.setDrawType(CadDrawTypeMode.UseObjectColor);
+        cadRasterizationOptions.setUnitType(UnitType.Unitless);
 
+        cadRasterizationOptions.getGraphicsOptions().setSmoothingMode(SmoothingMode.HighQuality);
+        cadRasterizationOptions.getGraphicsOptions().setTextRenderingHint(TextRenderingHint.AntiAliasGridFit);
+        cadRasterizationOptions.getGraphicsOptions().setInterpolationMode(InterpolationMode.HighQualityBicubic);
+        pdfOptions.setVectorRasterizationOptions(cadRasterizationOptions);
+        log.info("11111");
+
+
+             outputStream = httpServletResponse.getOutputStream();
+            objImage.save(outputStream,pdfOptions);
+        }catch (Exception e){
+
+        }finally {
+            try {
+                if(outputStream!=null){
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -424,7 +462,6 @@ public class FiletransferService implements IFiletransferService {
         }
 
     }
-
     @Override
     public void previewPictureFile(HttpServletResponse httpServletResponse, PreviewDTO previewDTO) {
         byte[] bytesUrl = Base64.getDecoder().decode(previewDTO.getUrl());
@@ -485,5 +522,16 @@ public class FiletransferService implements IFiletransferService {
     @Override
     public Long selectStorageSizeByUserIdDept(Long deptId) {
         return userFileMapper.selectStorageSizeByUserIdDept(deptId);
+    }
+    public static File asFile(InputStream inputStream,String name) throws IOException{
+        File tmp = File.createTempFile("11", "."+name, new File("C:\\"));
+        OutputStream os = new FileOutputStream(tmp);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
+            os.write(buffer, 0, bytesRead);
+        }
+        inputStream.close();
+        return tmp;
     }
 }
