@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.webgis.mapper.ResourceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ruoyi.webgis.model.po.ResourcePO">
+        <id column="resource_id" property="resourceId" />
+        <result column="resource_name" property="resourceName" />
+        <result column="resource_no" property="resourceNo" />
+        <result column="resource_down_url" property="resourceDownUrl" />
+        <result column="resource_api_url" property="resourceApiUrl" />
+        <result column="resource_share_url" property="resourceShareUrl" />
+        <result column="resource_status" property="resourceStatus" />
+        <result column="del_tag" property="delTag" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="version" property="version" />
+        <result column="project_id" property="projectId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        resource_id, resource_name, resource_no, resource_down_url, resource_api_url, resource_share_url, resource_status, del_tag, create_time, update_time, version, project_id
+    </sql>
+
+</mapper>

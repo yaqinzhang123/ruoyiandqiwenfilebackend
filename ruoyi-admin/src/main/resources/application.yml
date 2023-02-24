@@ -18,7 +18,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: 8088
   servlet:
     # 应用的访问路径
     context-path: /
@@ -55,13 +55,22 @@ spring:
     basename: i18n/messages
   profiles: 
     active: druid
+  freemarker:
+    suffix: .html
+    cache: false
+  mvc:
+    view:
+      prefix: classpath:/templates/
+      suffix: .html
+  resources:
+    static-locations: classpath:/static/
   # 文件上传
   servlet:
      multipart:
        # 单个文件大小
-       max-file-size:  10MB
+       max-file-size:  1000MB
        # 设置总上传的文件大小
-       max-request-size:  20MB
+       max-request-size:  20000MB
   # 服务模块
   devtools:
     restart:
@@ -208,3 +217,23 @@ files:
       example:
     secret:
     header: Authorization
+#文件上传配置
+fileupload:
+  config:
+    # 文件上传目录
+    #uploadFolder: /usr/local/upload
+    uploadFolder: c://webupload/
+    #静态资源对外暴露的访问路径(访问图片的路径)
+    staticAccessPath: storage/**
+    # 设备截图文件保存路径(文件存在具体的文件夹的路径)
+    localPath: fileData/
+    #用户头像存放
+    userHeaderPicPath: user/
+    #档案文件存放
+    archivesFilePath: webuploadfile/
+    #访问域名和端口
+    domain: http://localhost:${server.port}${server.servlet.context-path}
+
+nginx:
+  path: F:/Yaqin/java/ruoyiandqiwenfilebackend/nginx
+  config: F:/Yaqin/java/ruoyiandqiwenfilebackend/nginx/conf/nginx.conf

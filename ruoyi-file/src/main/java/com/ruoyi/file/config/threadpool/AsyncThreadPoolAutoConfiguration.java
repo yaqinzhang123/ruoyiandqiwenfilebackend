@@ -67,7 +67,7 @@ public class AsyncThreadPoolAutoConfiguration implements AsyncConfigurer {
          */
         taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
         //初始化
-        //taskExecutor.initialize();
+        taskExecutor.initialize();
 
         return taskExecutor;
     }

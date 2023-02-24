@@ -70,7 +70,11 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-file</artifactId>
         </dependency>
-
+        <!-- webgis-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-webgis</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

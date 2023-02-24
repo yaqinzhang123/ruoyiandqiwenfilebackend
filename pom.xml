@@ -222,6 +222,12 @@
                 <artifactId>ruoyi-file</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+            <!-- 网盘工具-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-webgis</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -234,6 +240,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-file</module>
+        <module>ruoyi-webgis</module>
     </modules>
     <packaging>pom</packaging>
     <build>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.webgis.mapper.ProjectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ruoyi.webgis.model.po.ProjectPO">
+        <id column="project_id" property="projectId" />
+        <result column="project_name" property="projectName" />
+        <result column="project_port" property="projectPort" />
+        <result column="project_desc" property="projectDesc" />
+        <result column="user_id" property="userId" />
+        <result column="del_tag" property="delTag" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="version" property="version" />
+        <result column="switch_tag" property="switchTag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        project_id, project_name, project_port, project_desc, user_id, del_tag, create_time, update_time, version, switch_tag
+    </sql>
+
+</mapper>
