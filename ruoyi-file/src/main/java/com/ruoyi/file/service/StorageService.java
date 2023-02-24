@@ -49,10 +49,23 @@ public class StorageService extends ServiceImpl<StorageMapper, StorageBean> impl
         }
         return totalStorageSize;
     }
-
-    public boolean checkStorage(Long userId, Long fileSize) {
+    public void setTotalStorageSize(Long deptId,Long totalStorageSize) {
         LambdaQueryWrapper<StorageBean> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StorageBean::getUserId, userId);
+        lambdaQueryWrapper.eq(StorageBean::getUserId, deptId);
+        StorageBean storageBean = storageMapper.selectOne(lambdaQueryWrapper);
+        if (storageBean == null || storageBean.getTotalStorageSize() == null) {
+            storageBean = new StorageBean();
+            storageBean.setUserId(deptId);
+            storageBean.setTotalStorageSize(totalStorageSize);
+            storageMapper.insert(storageBean);
+        } else  {
+            storageBean.setTotalStorageSize(totalStorageSize);
+            storageMapper.updateById(storageBean);
+        }
+    }
+    public boolean checkStorage(Long deptId, Long fileSize) {
+        LambdaQueryWrapper<StorageBean> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(StorageBean::getUserId, deptId);
 
         StorageBean storageBean = storageMapper.selectOne(lambdaQueryWrapper);
         Long totalStorageSize = null;
@@ -62,7 +75,7 @@ public class StorageService extends ServiceImpl<StorageMapper, StorageBean> impl
             SysParam sysParam = sysParamMapper.selectOne(lambdaQueryWrapper1);
             totalStorageSize = Long.parseLong(sysParam.getSysParamValue());
             storageBean = new StorageBean();
-            storageBean.setUserId(userId);
+            storageBean.setUserId(deptId);
             storageBean.setTotalStorageSize(totalStorageSize);
             storageMapper.insert(storageBean);
         } else  {
@@ -73,7 +86,7 @@ public class StorageService extends ServiceImpl<StorageMapper, StorageBean> impl
             totalStorageSize = totalStorageSize * 1024 * 1024;
         }
 
-        Long storageSize = userFileMapper.selectStorageSizeByUserId(userId);
+        Long storageSize = userFileMapper.selectStorageSizeByUserId(deptId);
         if (storageSize == null ){
             storageSize = 0L;
         }

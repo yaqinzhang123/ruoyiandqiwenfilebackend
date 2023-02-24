@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.file.domain.StorageBean;
 
 public interface IStorageService extends IService<StorageBean> {
-    Long getTotalStorageSize(Long userId);
-    boolean checkStorage(Long userId, Long fileSize);
+    Long getTotalStorageSize(Long deptId);
+    void setTotalStorageSize(Long deptId,Long totalStorageSize);
+    boolean checkStorage(Long deptId, Long fileSize);
 }

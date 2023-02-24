@@ -309,8 +309,26 @@ public class FiletransferController {
         storage.setStorageSize(storageSize);
         Long totalStorageSize = storageService.getTotalStorageSize(sessionUserBean.getDeptId());
         storage.setTotalStorageSize(totalStorageSize);
-
         return AjaxResult.success(storage);
+    }
+    @Operation(summary = "修改存储信息", description = "修改存储信息", tags = {"filetransfer"})
+    @RequestMapping(value = "/setTotalStorage", method = RequestMethod.GET)
+    @ResponseBody
+    public AjaxResult setTotalStorage(Long totalStorage) {
+        LoginUser sessionUserBean= SecurityUtils.getLoginUser();
+        StorageBean storageBean = new StorageBean();
+        storageBean.setUserId(sessionUserBean.getDeptId());
+        Long storageSize = filetransferService.selectStorageSizeByUserIdDept(sessionUserBean.getDeptId());//已用容量
+        StorageBean storage = new StorageBean();
+        storage.setUserId(sessionUserBean.getDeptId());
+        Long usedSize=storageSize/1024/1024;
+        if(totalStorage>0&&totalStorage>usedSize){
+            // 将userid改为deptId
+
+            storageService.setTotalStorageSize(sessionUserBean.getDeptId(),totalStorage);
+            return AjaxResult.success();
+        }
+        return AjaxResult.error("总存储大小需大于已用存储大小！已用存储:"+usedSize+"M,设置容量大小："+totalStorage+"M。");
 
     }
 
