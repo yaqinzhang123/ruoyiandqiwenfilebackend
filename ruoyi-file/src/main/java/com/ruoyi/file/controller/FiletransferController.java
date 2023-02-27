@@ -326,6 +326,8 @@ public class FiletransferController {
             // 将userid改为deptId
 
             storageService.setTotalStorageSize(sessionUserBean.getDeptId(),totalStorage);
+
+
             return AjaxResult.success();
         }
         return AjaxResult.error("总存储大小需大于已用存储大小！已用存储:"+usedSize+"M,设置容量大小："+totalStorage+"M。");

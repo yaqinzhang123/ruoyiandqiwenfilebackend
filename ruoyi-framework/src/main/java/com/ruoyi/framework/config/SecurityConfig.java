@@ -117,7 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                         "/share/sharetype",
                         "/share/checkextractioncode",
                         "/share/checkendtime",
-                        "/view"
+                        "/view","/admin/sys/**"
                         ).permitAll()
                 // 静态资源，可匿名访问
                 .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**","/upload/**").permitAll()
