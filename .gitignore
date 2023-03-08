@@ -4,7 +4,7 @@
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
-
+nginx/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 

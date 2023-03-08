@@ -196,7 +196,7 @@ qiwen:
 
   # 当前部署外网IP，用于office预览
 deployment:
-  host: 192.168.30.139
+  host: 192.168.30.217
 
 filesize-max: 5242880
 storage-folder: app_data
@@ -209,7 +209,7 @@ files:
     timeout: 120000
 
     url:
-      site: http://192.168.30.139:10000/
+      site: http://192.168.30.217:10000/
       converter: ConvertService.ashx
       command: coauthoring/CommandService.ashx
       api: web-apps/apps/api/documents/api.js

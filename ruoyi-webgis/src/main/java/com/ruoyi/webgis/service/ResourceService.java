@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public interface ResourceService extends IService<ResourcePO> {
     JsonData resourceList(String searchName, int currentPage,Long projectId, Integer resourceType);
+    JsonData resourceList1(String searchName, int currentPage,Long projectId, Integer resourceType,Integer modelType);
 
     JsonData resourceDel(Long resourceId);
 

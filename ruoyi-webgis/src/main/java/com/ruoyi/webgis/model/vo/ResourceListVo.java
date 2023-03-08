@@ -25,8 +25,9 @@ public class ResourceListVo {
     private String resourcePath;
 
     private Integer resourceStatus;
-
-
+    private String description;
+    private Integer visitsNumber;
+    private Integer modelType;
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 

@@ -1,5 +1,7 @@
 package com.ruoyi.webgis.controller;
 
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.webgis.constant.FileUploadInfo;
 import com.ruoyi.webgis.enums.BizCodeEnum;
 import com.ruoyi.webgis.model.po.ResourcePO;
@@ -58,7 +60,30 @@ public class ResourceController {
         }
         return resourceService.resourceList(searchName,currentPage,projectId,resourceType);
     }
-
+    @GetMapping(value = "/list1")
+    public JsonData list(@RequestParam(name = "searchName",defaultValue = "") String searchName,@RequestParam(name="currentPage",defaultValue = "1")  int currentPage,@RequestParam(name="projectId",defaultValue = "0")  Long projectId,@RequestParam(name="resourceType",defaultValue = "0") Integer resourceType,@RequestParam(name="modelType",defaultValue = "0") Integer modelType){
+        if (resourceType==null) {
+            return JsonData.buildResult(BizCodeEnum.Data_UNREGISTER);
+        }
+        return resourceService.resourceList1(searchName,currentPage,projectId,resourceType,modelType);
+    }
+    @PostMapping(value = "/edit")
+    public AjaxResult edit(@RequestBody ResourcePO entity){
+        if( !StringUtils.isEmpty(entity.getDescription())){
+            ResourcePO po=resourceService.getById(entity.getResourceId());
+            po.setDescription(entity.getDescription());
+            return resourceService.saveOrUpdate(po)?AjaxResult.success():AjaxResult.error("修改失败");
+        }
+        return AjaxResult.error("修改失败");
+    }
+    @GetMapping(value = "/visits")
+    public int visits(@RequestParam Long id){
+        ResourcePO resourcePO=resourceService.getById(id);
+        int sum=resourcePO.getVisitsNumber()+1;
+        resourcePO.setVisitsNumber(sum);
+        resourceService.saveOrUpdate(resourcePO);
+        return sum;
+    }
     @DeleteMapping("del")
     public JsonData projectDel(@RequestParam Long resourceId){
         if (resourceId==null){

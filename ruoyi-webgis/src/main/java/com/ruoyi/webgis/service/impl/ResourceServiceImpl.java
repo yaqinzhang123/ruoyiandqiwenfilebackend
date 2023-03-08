@@ -83,7 +83,39 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourcePO>
         pageVO.setData(resourceListVos);
         return JsonData.buildSuccess(pageVO);
     }
+    public JsonData query(QueryWrapper<ResourcePO> queryWrapper,int currentPage){
+        Page<ResourcePO> page = new Page<>(currentPage,10);
+        IPage<ResourcePO> iPage = resourceMapper.selectPage(page, queryWrapper);
+        //获取数据的总条数
+        long total = iPage.getTotal();
+        List<ResourceListVo> resourceListVos = iPage.getRecords().stream().map(resource -> {
+            ResourceListVo resourceListVo = new ResourceListVo();
+            BeanUtils.copyProperties(resource, resourceListVo);
+            return resourceListVo;
+        }).collect(Collectors.toList());
 
+        PageVO<ResourceListVo> pageVO = new PageVO<>();
+        pageVO.setTotalCount(total);
+        //获取数据的总页数
+        long pages = iPage.getPages();
+        pageVO.setTotalPage(pages);
+        pageVO.setPageSize(10L);
+        pageVO.setData(resourceListVos);
+        return JsonData.buildSuccess(pageVO);
+    }
+    @Override
+    public JsonData resourceList1(String searchName, int currentPage,Long projectId, Integer resourceStatus,Integer modelType) {
+        QueryWrapper<ResourcePO> queryWrapper = new QueryWrapper<ResourcePO>().like("resource_name", searchName).eq("project_id",projectId)
+                .eq("del_tag", StatusTypeConstant.GLOBAL_DEL_TAG_UNDELETE.getStatusCode()).orderByDesc("create_time");
+        if (resourceStatus!=0){
+            queryWrapper.eq("resource_status", resourceStatus);
+        }
+        if(modelType>0){
+            queryWrapper.eq("model_type", modelType);
+        }
+        Page<ResourcePO> page = new Page<>(currentPage,10);
+        return query(queryWrapper,currentPage);
+    }
     @Override
     public JsonData resourceDel(Long resourceId) {
 

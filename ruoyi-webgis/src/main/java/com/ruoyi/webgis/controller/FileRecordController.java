@@ -1,6 +1,14 @@
 package com.ruoyi.webgis.controller;
 
+import com.qiwenshare.common.anno.MyLog;
+import com.qiwenshare.ufop.factory.UFOPFactory;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.file.component.FileDealComp;
+import com.ruoyi.file.dto.file.UploadFileDTO;
+import com.ruoyi.file.service.StorageService;
+import com.ruoyi.file.vo.file.UploadFileVo;
+import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.webgis.common.base.BaseController;
 import com.ruoyi.webgis.constant.entity.SoulTableParam;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,9 +19,11 @@ import com.ruoyi.webgis.service.IFileRecordService;
 import com.ruoyi.webgis.constant.QueryWrapperConst;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -34,6 +44,16 @@ public class FileRecordController extends BaseController {
 
     @Autowired
     private IFileRecordService fileRecordService;
+    @Resource
+    TokenService tokenService;
+    @Resource
+    FileDealComp fileDealComp;
+    @Resource
+    StorageService storageService;
+    @Resource
+    UFOPFactory ufopFactory;
+
+    public static final String CURRENT_MODULE = "文件传输接口";
 
 //     @Autowired
 //     private IFileFilterService fileFilterService;
@@ -101,6 +121,45 @@ public class FileRecordController extends BaseController {
         return b?renderSuccess():renderError();
     }
 
+
+
+
+    @Operation(summary = "极速上传", description = "校验文件MD5判断文件是否存在，如果存在直接上传成功并返回skipUpload=true，如果不存在返回skipUpload=false需要再次调用该接口的POST方法", tags = {"filetransfer"})
+    @RequestMapping(value = "/uploadfile", method = RequestMethod.GET)
+    @MyLog(operation = "极速上传", module = CURRENT_MODULE)
+    @ResponseBody
+    public AjaxResult uploadFileSpeed(HttpServletRequest request, UploadFileDTO uploadFileDto) {
+
+        LoginUser sessionUserBean = tokenService.getLoginUser(request);
+
+//        boolean isCheckSuccess = storageService.checkStorage(sessionUserBean.getUserId(), uploadFileDto.getTotalSize());
+//        if (!isCheckSuccess) {
+//            return AjaxResult.error("存储空间不足");
+//        }
+        UploadFileVo uploadFileVo = fileRecordService.uploadFileSpeed(uploadFileDto,sessionUserBean.getUserId());
+        return AjaxResult.success(uploadFileVo);
+
+    }
+
+    @Operation(summary = "上传文件", description = "真正的上传文件接口", tags = {"fileRecord"})
+    @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
+    @MyLog(operation = "上传文件", module = CURRENT_MODULE)
+    @ResponseBody
+    public AjaxResult uploadFile(HttpServletRequest request, UploadFileDTO uploadFileDto) {
+
+        LoginUser sessionUserBean = tokenService.getLoginUser(request);
+
+        fileRecordService.uploadFile(request, uploadFileDto, sessionUserBean.getUserId());
+
+        UploadFileVo uploadFileVo = new UploadFileVo();
+        return AjaxResult.success(uploadFileVo);
+
+    }
+
+
+
+
+
     /**************************文件上传操作*********************************/
     /***
      * 单文件上传（<5M）
@@ -136,8 +195,8 @@ public class FileRecordController extends BaseController {
      * 前端需要传入总文件的MD5值
      */
     @PostMapping("/zone/upload/merge/{totalmd5}")
-    public AjaxResult mergeZoneFile(@PathVariable("totalmd5") String totalmd5,HttpServletRequest request,@RequestParam Long projectId){
-        return fileRecordService.mergeZoneFile(totalmd5,request,projectId);
+    public AjaxResult mergeZoneFile(@PathVariable("totalmd5") String totalmd5,HttpServletRequest request,@RequestParam Long projectId,@RequestParam Integer modelType){
+        return fileRecordService.mergeZoneFile(totalmd5,request,projectId,modelType);
     }
 
     /***

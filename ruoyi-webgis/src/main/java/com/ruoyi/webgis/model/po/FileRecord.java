@@ -1,8 +1,11 @@
 package com.ruoyi.webgis.model.po;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.qiwenshare.common.util.DateUtil;
+import com.qiwenshare.ufop.operation.upload.domain.UploadFileResult;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -172,9 +175,31 @@ public class FileRecord extends Model<FileRecord> {
 //	@TableLogic
     private Integer delFlag;
 
+	@TableField("storage_type")
+	private Integer storageType;
+
+	@TableField("file_status")
+	private Integer fileStatus;
+
 	@Override
 	public Serializable pkVal() {
 		return this.id;
+	}
+
+
+
+	public FileRecord(){
+
+	}
+	public FileRecord(UploadFileResult uploadFileResult) {
+		this.id = IdUtil.getSnowflakeNextIdStr();
+		this.serverLocalPath = uploadFileResult.getFileUrl();
+		this.fileSize = uploadFileResult.getFileSize();
+		this.fileStatus = 1;
+		this.storageType = uploadFileResult.getStorageType().getCode();
+		this.md5Value = uploadFileResult.getIdentifier();
+		this.createTime = new Date();
+
 	}
 
 }

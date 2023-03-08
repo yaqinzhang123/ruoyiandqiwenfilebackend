@@ -78,7 +78,6 @@ public class FileBean {
         this.identifier = identifier;
         this.createTime = DateUtil.getCurrentTime();
         this.createUserId = userId;
-
     }
 
 }

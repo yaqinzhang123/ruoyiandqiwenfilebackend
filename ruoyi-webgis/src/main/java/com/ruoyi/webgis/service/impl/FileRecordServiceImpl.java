@@ -2,7 +2,29 @@ package com.ruoyi.webgis.service.impl;
 
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.qiwenshare.ufop.constant.UploadFileStatusEnum;
+import com.qiwenshare.ufop.exception.operation.DownloadException;
+import com.qiwenshare.ufop.exception.operation.UploadException;
+import com.qiwenshare.ufop.factory.UFOPFactory;
+import com.qiwenshare.ufop.operation.download.Downloader;
+import com.qiwenshare.ufop.operation.download.domain.DownloadFile;
+import com.qiwenshare.ufop.operation.upload.Uploader;
+import com.qiwenshare.ufop.operation.upload.domain.UploadFile;
+import com.qiwenshare.ufop.operation.upload.domain.UploadFileResult;
+import com.qiwenshare.ufop.util.UFOPUtils;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.file.component.FileDealComp;
+import com.ruoyi.file.domain.*;
+import com.ruoyi.file.dto.file.UploadFileDTO;
+import com.ruoyi.file.io.QiwenFile;
+import com.ruoyi.file.mapper.UploadTaskDetailMapper;
+import com.ruoyi.file.mapper.UploadTaskMapper;
+import com.ruoyi.file.mapper.UserFileMapper;
+import com.ruoyi.file.util.QiwenFileUtil;
+import com.ruoyi.file.vo.file.UploadFileVo;
 import com.ruoyi.webgis.common.FileHandleUtil;
 import com.ruoyi.webgis.common.FileUploadConfig;
 import com.ruoyi.webgis.common.entity.ResultCode;
@@ -20,6 +42,7 @@ import com.ruoyi.webgis.utils.JsonData;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -28,9 +51,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -51,12 +73,23 @@ public class FileRecordServiceImpl extends ServiceImpl<FileRecordMapper, FileRec
 
     @Autowired
     private ResourceService resourceService;
+    @Resource
+    UploadTaskDetailMapper uploadTaskDetailMapper;
+    @Resource
+    UploadTaskMapper uploadTaskMapper;
 
     @Autowired
     private IdWorker idWorker;
 
     @Autowired
     private IFileZoneRecordService fileZoneRecordService;
+    @Resource
+    UserFileMapper userFileMapper;
+
+    @Resource
+    UFOPFactory ufopFactory;
+    @Resource
+    FileDealComp fileDealComp;
 
     @Override
     public AjaxResult upload(HttpServletRequest request, Integer uploadType, Integer storageYear) {
@@ -274,7 +307,7 @@ public class FileRecordServiceImpl extends ServiceImpl<FileRecordMapper, FileRec
     }
 
     @Override
-    public AjaxResult mergeZoneFile(String totalmd5,HttpServletRequest request,Long projectId) {
+    public AjaxResult mergeZoneFile(String totalmd5,HttpServletRequest request,Long projectId,Integer modelType) {
         //查询所有的分片文件
         if(totalmd5!=null&&totalmd5.trim().length()>0){
             FileRecord fileRecordb = this.selByMD5AndUpType(totalmd5, 2);
@@ -368,6 +401,7 @@ public class FileRecordServiceImpl extends ServiceImpl<FileRecordMapper, FileRec
                         resourcePO.setResourceApiUrl(resourceSaveProject.get("port"));
                         resourcePO.setResourceShareUrl("?port="+resourceSaveProject.get("port")+"&fileid=");
                         resourcePO.setProjectId(projectId);
+                        resourcePO.setModelType(modelType);
                         JsonData jsonData = resourceService.insertUploadResourceAndExrtZip(resourcePO);
                         return AjaxResult.success(map);
                     }
@@ -520,4 +554,234 @@ public class FileRecordServiceImpl extends ServiceImpl<FileRecordMapper, FileRec
 //        int count = fileFilterService.count(queryWrapper);
 //        return count>0;
 //    }
+
+
+
+    @Override
+    public UploadFileVo uploadFileSpeed(UploadFileDTO uploadFileDTO, Long userId) {
+        UploadFileVo uploadFileVo = new UploadFileVo();
+        Map<String, Object> param = new HashMap<>();
+        param.put("md5_value", uploadFileDTO.getIdentifier());
+        List<FileRecord> list = fileRecordMapper.selectByMap(param);
+
+        String filePath = uploadFileDTO.getFilePath();
+        String relativePath = uploadFileDTO.getRelativePath();
+        QiwenFile qiwenFile = null;
+        if (relativePath.contains("/")) {
+            qiwenFile = new QiwenFile(filePath, relativePath, false);
+        } else {
+            qiwenFile = new QiwenFile(filePath, uploadFileDTO.getFilename(), false);
+        }
+
+        if (list != null && !list.isEmpty()) {
+//            FileRecord file = list.get(0);
+
+//            UserFile userFile = new UserFile(qiwenFile, userId, file.getId());
+//            UserFile param1 = QiwenFileUtil.searchQiwenFileParam(userFile);
+//            List<UserFile> userFileList = userFileMapper.selectList(new QueryWrapper<>(param1));
+//            if (userFileList.size() <= 0) {
+//                userFileMapper.insert(userFile);
+//                fileDealComp.uploadESByUserFileId(userFile.getUserFileId());
+//            }
+//            if (relativePath.contains("/")) {
+//                fileDealComp.restoreParentFilePath(qiwenFile, userId);
+//            }
+
+            uploadFileVo.setSkipUpload(true);
+        } else {
+            uploadFileVo.setSkipUpload(false);
+
+            List<Integer> uploaded = uploadTaskDetailMapper.selectUploadedChunkNumList(uploadFileDTO.getIdentifier());
+            if (uploaded != null && !uploaded.isEmpty()) {
+                uploadFileVo.setUploaded(uploaded);
+            } else {
+
+                LambdaQueryWrapper<UploadTask> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                lambdaQueryWrapper.eq(UploadTask::getIdentifier, uploadFileDTO.getIdentifier());
+                List<UploadTask> rslist = uploadTaskMapper.selectList(lambdaQueryWrapper);
+                if (rslist == null || rslist.isEmpty()) {
+                    UploadTask uploadTask = new UploadTask();
+                    uploadTask.setIdentifier(uploadFileDTO.getIdentifier());
+                    uploadTask.setUploadTime(com.qiwenshare.common.util.DateUtil.getCurrentTime());
+                    uploadTask.setUploadStatus(UploadFileStatusEnum.UNCOMPLATE.getCode());
+                    uploadTask.setFileName(qiwenFile.getNameNotExtend());
+                    uploadTask.setFilePath(qiwenFile.getParent());
+                    uploadTask.setExtendName(qiwenFile.getExtendName());
+                    uploadTask.setUserId(userId);
+                    uploadTaskMapper.insert(uploadTask);
+                }
+            }
+
+        }
+        return uploadFileVo;
+    }
+
+    @Override
+    public void uploadFile(HttpServletRequest request, UploadFileDTO uploadFileDto, Long userId) {
+
+        UploadFile uploadFile = new UploadFile();
+        uploadFile.setChunkNumber(uploadFileDto.getChunkNumber());
+        uploadFile.setChunkSize(uploadFileDto.getChunkSize());
+        uploadFile.setTotalChunks(uploadFileDto.getTotalChunks());
+        uploadFile.setIdentifier(uploadFileDto.getIdentifier());
+        uploadFile.setTotalSize(uploadFileDto.getTotalSize());
+        uploadFile.setCurrentChunkSize(uploadFileDto.getCurrentChunkSize());
+
+        Uploader uploader = ufopFactory.getUploader();
+        if (uploader == null) {
+            log.error("上传失败，请检查storageType是否配置正确");
+            throw new UploadException("上传失败");
+        }
+        List<UploadFileResult> uploadFileResultList;
+        try {
+            uploadFileResultList = uploader.upload(request, uploadFile);
+        } catch (Exception e) {
+            log.error("上传失败，请检查UFOP连接配置是否正确");
+            throw new UploadException("上传失败", e);
+        }
+        for (int i = 0; i < uploadFileResultList.size(); i++) {
+            UploadFileResult uploadFileResult = uploadFileResultList.get(i);
+            String relativePath = uploadFileDto.getRelativePath();
+            QiwenFile qiwenFile = null;
+            if (relativePath.contains("/")) {
+                qiwenFile = new QiwenFile(uploadFileDto.getFilePath(), relativePath, false);
+            } else {
+                qiwenFile = new QiwenFile(uploadFileDto.getFilePath(), uploadFileDto.getFilename(), false);
+            }
+
+            if (UploadFileStatusEnum.SUCCESS.equals(uploadFileResult.getStatus())) {
+                //存resource
+                // 年月日/时分  如果短时间内，上传并发量大，还可分得更细 秒 毫秒 等等
+                String fileType = uploadFileDto.getFilename();
+                String path_date= DateUtil.format(new Date(),"yyyy")+"/"+DateUtil.format(new Date(),"MMdd")+"/"+DateUtil.format(new Date(),"HH")+"/";
+                String pathTypeDir=fileUploadConfig.getArchivesFilePath()+fileType+"/";
+
+                //获取合并文件保存路径
+                Map<String, String> resourceSaveProject = resourceService.getResourceSaveProject(uploadFileDto.getProjectId());
+                if (resourceSaveProject==null){
+//                    return AjaxResult.error("操作失败，原因：项目已被删除");
+                }
+                String localPath=resourceSaveProject.get("basePath");
+
+                //随机生成服务器本地路径
+
+                String fileSuffix = getFileSuffix(uploadFileDto.getFilename());
+                String randomFileName = CommonUtil.generateUUID();
+                String serverFileName= randomFileName+fileSuffix;
+                String saticAccess = fileUploadConfig.getStaticAccessPath().replace("*", "");
+                String netWorkPath="/"+saticAccess+pathTypeDir+path_date+"/"+ serverFileName;
+
+               //存nginx一份
+                    FileHandleUtil.createDirIfNotExists(localPath);
+                    File destTempFile = new File(localPath, serverFileName);
+                    if(!destTempFile.exists()){
+                        //先得到文件的上级目录，并创建上级目录，在创建文件,
+                        destTempFile.getParentFile().mkdir();
+                        try {
+                            //创建文件
+                            destTempFile.createNewFile(); //上级目录没有创建，这里会报错
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                //向数据库中插入上传的源文件（待压缩状态）
+                ResourcePO resourcePO = new ResourcePO();
+                resourcePO.setResourceName(uploadFileDto.getFilename());
+                resourcePO.setResourcePath(localPath+serverFileName);
+                resourcePO.setCreateTime(new Date());
+                resourcePO.setUpdateTime(new Date());
+                resourcePO.setResourceNo(randomFileName);
+                resourcePO.setVisitsNumber(0);
+                resourcePO.setResourceDownUrl(resourceSaveProject.get("port")+File.separator+serverFileName);
+                resourcePO.setResourceApiUrl(resourceSaveProject.get("port"));
+                resourcePO.setResourceShareUrl("?port="+resourceSaveProject.get("port")+"&fileid=");
+                resourcePO.setProjectId(uploadFileDto.getProjectId());
+                resourcePO.setModelType(uploadFileDto.getModelType());
+                JsonData jsonData = resourceService.insertUploadResourceAndExrtZip(resourcePO);
+//                FileRecord file = new FileRecord(uploadFileResult);
+//                file.setCreateBy(SecurityUtils.getUsername());
+//                fileRecordMapper.insert(file);
+//
+//                //本地路径  1 用户头像  2 商城图片
+//                Integer uploadType = 1;
+//                //计算MD5值
+//                String filemd5 = uploadFileDto.getIdentifier();
+//                //查询数据库是否已经有了，有直接写入，没有，写入磁盘
+//                FileRecord fileRecorddb = selByMD5AndUpType(filemd5, uploadType);
+//                Map<String, String> map = new HashMap<>();
+//                //!!!!
+//                String fileType = uploadFileDto.getFilename();
+//                if (fileRecorddb == null) {
+//                    String pathTypeDir = (uploadType == 1 ? fileUploadConfig.getUserHeaderPicPath() : fileUploadConfig.getArchivesFilePath()) + fileType + "/";
+//                    // 年月日/时分  如果短时间内，上传并发量大，还可分得更细 秒 毫秒 等等
+//                    String path_date = DateUtil.format(new Date(), "yyyy") + "/" + DateUtil.format(new Date(), "MMdd") + "/" + DateUtil.format(new Date(), "HH");
+//                    String localPath = getUploadFolder() + fileUploadConfig.getLocalPath() + pathTypeDir + path_date;
+//                    //随机生成服务器本地路径
+//                    String fileSuffix = getFileSuffix(uploadFileDto.getFilename());
+//                    String serverFileName = fileSuffix;
+//                    Downloader downloader = ufopFactory.getDownloader(uploadFileResult.getStorageType().getCode());
+//                    DownloadFile downloadFile = new DownloadFile();
+//                    downloadFile.setFileUrl(file.getServerLocalPath());
+//                    InputStream in = downloader.getInputStream(downloadFile);
+//
+//                    FileHandleUtil.upload(in, localPath, serverFileName);
+//                    String saticAccess = fileUploadConfig.getStaticAccessPath().replace("*", "");
+//                    String netWorkPath = "/" + saticAccess + pathTypeDir + path_date + "/" + serverFileName;
+//                    map.put("network", netWorkPath);
+//
+//                    FileRecord fileRecord = new FileRecord();
+//                    fileRecord.setDownloadCount(0);
+//                    fileRecord.setUploadCount(1);
+//                    fileRecord.setIsMerge(1);//单文件，完整文件
+//                    fileRecord.setIsZone(0);
+//                    fileRecord.setFileSize(uploadFileDto.getTotalSize());
+//                    fileRecord.setFileType(fileType);
+//                    fileRecord.setMd5Value(filemd5);
+//                    fileRecord.setOrgName(uploadFileDto.getFilename());
+//                    fileRecord.setUploadType(uploadType);
+//                    fileRecord.setServerLocalName(serverFileName);
+//                    fileRecord.setServerLocalPath(localPath + serverFileName);
+//                    fileRecord.setStorageDate(getDateToYear(100));//默认一百年
+//                    fileRecord.setNetworkPath(netWorkPath);
+//                    String fileId = saveFileRecord(request, fileRecord);
+//                    map.put("fileId", fileId);
+//                    map.put("network", fileRecord.getNetworkPath());
+
+                    LambdaQueryWrapper<UploadTaskDetail> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                    lambdaQueryWrapper.eq(UploadTaskDetail::getIdentifier, uploadFileDto.getIdentifier());
+                    uploadTaskDetailMapper.delete(lambdaQueryWrapper);
+
+                    LambdaUpdateWrapper<UploadTask> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                    lambdaUpdateWrapper.set(UploadTask::getUploadStatus, UploadFileStatusEnum.SUCCESS.getCode())
+                            .eq(UploadTask::getIdentifier, uploadFileDto.getIdentifier());
+                    uploadTaskMapper.update(null, lambdaUpdateWrapper);
+                    fileDealComp.parseMusicFile(uploadFileResult.getExtendName(), uploadFileResult.getStorageType().getCode(), uploadFileResult.getFileUrl(), resourcePO.getResourceId()+"");
+
+                } else if (UploadFileStatusEnum.UNCOMPLATE.equals(uploadFileResult.getStatus())) {
+                    UploadTaskDetail uploadTaskDetail = new UploadTaskDetail();
+                    uploadTaskDetail.setFilePath(qiwenFile.getParent());
+                    uploadTaskDetail.setFileName(qiwenFile.getNameNotExtend());
+                    uploadTaskDetail.setChunkNumber(uploadFileDto.getChunkNumber());
+                    uploadTaskDetail.setChunkSize((int) uploadFileDto.getChunkSize());
+                    uploadTaskDetail.setRelativePath(uploadFileDto.getRelativePath());
+                    uploadTaskDetail.setTotalChunks(uploadFileDto.getTotalChunks());
+                    uploadTaskDetail.setTotalSize((int) uploadFileDto.getTotalSize());
+                    uploadTaskDetail.setIdentifier(uploadFileDto.getIdentifier());
+                    uploadTaskDetailMapper.insert(uploadTaskDetail);
+
+                } else if (UploadFileStatusEnum.FAIL.equals(uploadFileResult.getStatus())) {
+                    LambdaQueryWrapper<UploadTaskDetail> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                    lambdaQueryWrapper.eq(UploadTaskDetail::getIdentifier, uploadFileDto.getIdentifier());
+                    uploadTaskDetailMapper.delete(lambdaQueryWrapper);
+                    LambdaUpdateWrapper<UploadTask> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                    lambdaUpdateWrapper.set(UploadTask::getUploadStatus, UploadFileStatusEnum.FAIL.getCode())
+                            .eq(UploadTask::getIdentifier, uploadFileDto.getIdentifier());
+                    uploadTaskMapper.update(null, lambdaUpdateWrapper);
+                }
+            }
+
+        }
+
+
 }

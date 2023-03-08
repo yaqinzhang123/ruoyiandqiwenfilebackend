@@ -6,13 +6,14 @@ import java.util.Date;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.common.utils.SecurityUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author 中科吉芯
@@ -20,33 +21,36 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("resource")
-public class ResourcePO implements Serializable{
+@TableName("scene")
+public class Scene implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "resource_id", type = IdType.AUTO)
-    private Long resourceId;
+    @TableId(value = "scene_id", type = IdType.AUTO)
+    private Long sceneId;
 
-    private String resourceName;
+    private String sceneName;
 
-    private String resourceNo;
+    private String sceneNo;
 
-    private String resourceDownUrl;
+    private String sceneDownUrl;
 
-    private String resourceApiUrl;
+    private String sceneApiUrl;
 
-    private String resourceShareUrl;
+    private String sceneShareUrl;
 
-    private String resourcePath;
+    private String scenePath;
 
-    private Integer resourceStatus;
+    private Integer sceneStatus;
 
     private Integer delTag;
+    private String img;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+
+    private String creator;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -54,10 +58,15 @@ public class ResourcePO implements Serializable{
 
     private Integer version;
 
-    private Long projectId;
     private String description;
     private Integer visitsNumber;
-    private Integer modelType;
+
+    public Scene(){
+        this.createTime=new Date();
+        this.updateTime=new Date();
+        this.creator= SecurityUtils.getUsername();
+    }
+
 
 
 

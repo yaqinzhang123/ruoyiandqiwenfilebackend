@@ -31,5 +31,12 @@ public class UploadFileDTO {
     private long currentChunkSize;
     @Schema(description = "md5码")
     private String identifier;
+    @Schema(description = "projectId")
+    private Long projectId;
+    @Schema(description = "modelType")
+    private int modelType;
+
+
+
 
 }

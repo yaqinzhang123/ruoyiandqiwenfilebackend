@@ -333,6 +333,10 @@ public class FiletransferService implements IFiletransferService {
                     DownloadFile downloadFile = new DownloadFile();
                     downloadFile.setFileUrl(fileBean.getFileUrl());
                     InputStream inputStream = downloader.getInputStream(downloadFile);
+                    if(inputStream==null){
+                        log.error("下载失败，文件找不到");
+                        throw new UploadException("下载失败");
+                    }
                     BufferedInputStream bis = new BufferedInputStream(inputStream);
                     try {
                         QiwenFile qiwenFile = new QiwenFile(userFile1.getFilePath().replaceFirst(filePath, ""), userFile1.getFileName() + "." + userFile1.getExtendName(), false);
