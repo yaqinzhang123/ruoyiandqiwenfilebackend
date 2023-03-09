@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -25,7 +24,7 @@ import com.ruoyi.system.service.ISysPostService;
 
 /**
  * 岗位信息操作处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -46,7 +45,7 @@ public class SysPostController extends BaseController
         List<SysPost> list = postService.selectPostList(post);
         return getDataTable(list);
     }
-    
+
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:post:export')")
     @PostMapping("/export")
@@ -75,11 +74,11 @@ public class SysPostController extends BaseController
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysPost post)
     {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
+        if (!postService.checkPostNameUnique(post))
         {
             return error("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         }
-        else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
+        else if (!postService.checkPostCodeUnique(post))
         {
             return error("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }
@@ -95,11 +94,11 @@ public class SysPostController extends BaseController
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysPost post)
     {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
+        if (!postService.checkPostNameUnique(post))
         {
             return error("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
         }
-        else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
+        else if (!postService.checkPostCodeUnique(post))
         {
             return error("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }

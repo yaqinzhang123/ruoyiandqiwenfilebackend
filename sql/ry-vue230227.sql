@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.08 (64 bit)
 MySQL - 8.0.31 : Database - ry-vue
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -441,7 +442,7 @@ CREATE TABLE `sys_config` (
 
 /*Data for the table `sys_config` */
 
-insert  into `sys_config`(`config_id`,`config_name`,`config_key`,`config_value`,`config_type`,`create_by`,`create_time`,`update_by`,`update_time`,`remark`) values (1,'主框架页-默认皮肤样式名称','sys.index.skinName','skin-blue','Y','admin','2022-12-30 11:51:15','',NULL,'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow'),(2,'用户管理-账号初始密码','sys.user.initPassword','123456','Y','admin','2022-12-30 11:51:15','',NULL,'初始化密码 123456'),(3,'主框架页-侧边栏主题','sys.index.sideTheme','theme-dark','Y','admin','2022-12-30 11:51:15','',NULL,'深色主题theme-dark，浅色主题theme-light'),(4,'账号自助-验证码开关','sys.account.captchaEnabled','true','Y','admin','2022-12-30 11:51:15','',NULL,'是否开启验证码功能（true开启，false关闭）'),(5,'账号自助-是否开启用户注册功能','sys.account.registerUser','false','Y','admin','2022-12-30 11:51:15','',NULL,'是否开启注册用户功能（true开启，false关闭）');
+insert  into `sys_config`(`config_id`,`config_name`,`config_key`,`config_value`,`config_type`,`create_by`,`create_time`,`update_by`,`update_time`,`remark`) values (1,'主框架页-默认皮肤样式名称','sys.index.skinName','skin-blue','Y','admin','2022-12-30 11:51:15','',NULL,'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow'),(2,'用户管理-账号初始密码','sys.user.initPassword','123456','Y','admin','2022-12-30 11:51:15','',NULL,'初始化密码 123456'),(3,'主框架页-侧边栏主题','sys.index.sideTheme','theme-dark','Y','admin','2022-12-30 11:51:15','',NULL,'深色主题theme-dark，浅色主题theme-light'),(4,'账号自助-验证码开关','sys.account.captchaEnabled','true','Y','admin','2022-12-30 11:51:15','',NULL,'是否开启验证码功能（true开启，false关闭）'),(5,'账号自助-是否开启用户注册功能','sys.account.registerUser','false','Y','admin','2022-12-30 11:51:15','',NULL,'是否开启注册用户功能（true开启，false关闭）'),(6,'用户登录-黑名单列表',           'sys.login.blackIPList',         '',              'Y', 'admin', sysdate(), '', null, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
 
 /*Table structure for table `sys_dept` */
 
@@ -630,7 +631,9 @@ CREATE TABLE `sys_logininfor` (
   `status` char(1) COLLATE utf8mb4_general_ci DEFAULT '0' COMMENT '登录状态（0成功 1失败）',
   `msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '提示消息',
   `login_time` datetime DEFAULT NULL COMMENT '访问时间',
-  PRIMARY KEY (`info_id`)
+  PRIMARY KEY (`info_id`),
+  KEY idx_sys_logininfor_s  (`status`),
+  KEY idx_sys_logininfor_lt (`login_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=416 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
 
 /*Data for the table `sys_logininfor` */
@@ -711,7 +714,11 @@ CREATE TABLE `sys_oper_log` (
   `status` int DEFAULT '0' COMMENT '操作状态（0正常 1异常）',
   `error_msg` varchar(2000) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '错误消息',
   `oper_time` datetime DEFAULT NULL COMMENT '操作时间',
-  PRIMARY KEY (`oper_id`)
+  `cost_time` bigint(20)  DEFAULT '0'  COMMENT '消耗时间',
+  PRIMARY KEY (`oper_id`),
+  KEY idx_sys_oper_log_bt (`business_type`),
+  KEY idx_sys_oper_log_s  (`status`),
+  KEY idx_sys_oper_log_ot (`oper_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=199 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
 
 /*Data for the table `sys_oper_log` */
